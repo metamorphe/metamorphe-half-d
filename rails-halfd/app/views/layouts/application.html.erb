@@ -1,14 +1,67 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>RailsHalfd</title>
+  <title>2.5D - <%= params[:action].humanize %></title>
   <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true %>
   <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
+    <%= stylesheet_link_tag params[:controller], media: 'all', 'data-turbolinks-track' => true %>
+  <%= javascript_include_tag params[:controller], 'data-turbolinks-track' => true %>
+  <script type="text/javascript" src="//use.typekit.net/duw7epu.js"></script>
+	<script>
+		try { Typekit.load(); } catch (e) {}
+	</script>
   <%= csrf_meta_tags %>
 </head>
 <body>
 
-<%= yield %>
+<body class='gray'>
+	<nav class="navbar navbar-default" role="navigation">
+	  <div class="container-fluid">
+	    <!-- Brand and toggle get grouped for better mobile display -->
+	    <div class="navbar-header">
+	      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+	        <span class="sr-only">Toggle navigation</span>
+	        <span class="icon-bar"></span>
+	        <span class="icon-bar"></span>
+	        <span class="icon-bar"></span>
+	      </button>
+	      <a class="navbar-brand" href="/"><b id='logo'>MetaMorphe 2.5D</b></a>
+	    </div>
+
+	    <!-- Collect the nav links, forms, and other content for toggling -->
+	    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+	      <ul class="nav navbar-nav">
+	        <li class="<%= params[:action] == "home" ? "active" : "" %>">
+	        	<a href="/"> Home</a>
+	        </li>
+	        <li class="<%= params[:action] == "height-displacement" ? "active" : "" %>">
+	        	<li><%= link_to "pic2stl", pic2stl_path %> </li>
+	        </li>    	
+	       </ul>
+
+	    </div><!-- /.navbar-collapse -->
+	  </div><!-- /.container-fluid -->
+	</nav>
+	
+	  <div class="container">
+	  	<% if notice %>
+		  <p class="alert alert-success"><%= notice %></p>
+		<% end %>
+		<% if alert %>
+		  <p class="alert alert-danger"><%= alert %></p>
+		<% end %>
+	    <%= yield %>
+	  </div>
+	
+
+	
+</body>
+<footer class="footer shadow">
+  <div class="container">
+    <p class="text-muted"> <a href="/"><b>MetaMorphe</b></a>
+    	CC BY-SA 4.0 UC Berkeley 2013-14</p>
+  </div>
+</footer>
 
 </body>
 </html>

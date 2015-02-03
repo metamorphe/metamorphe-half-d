@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-
+# DEFAULT GEMS
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '4.1.4'
 # Use sqlite3 as the database for Active Record
@@ -38,3 +38,12 @@ gem 'spring',        group: :development
 # Use debugger
 # gem 'debugger', group: [:development, :test]
 
+# PROJECT GEMS
+gem 'thin'
+gem 'carrierwave'
+gem 'bootstrap-sass', 
+  git: 'https://github.com/twbs/bootstrap-sass', 
+  ref: '540ad23430b1bdb2c72591daf61507ec9e38e468'
+gem 'rmagick', '~> 2.13.2', require: false
+gem 'threejs-rails', git: 'git://github.com/marvindanig/threejs-rails.git'
+gem 'markdown-rails'

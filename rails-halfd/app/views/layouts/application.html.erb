@@ -11,6 +11,21 @@
 		try { Typekit.load(); } catch (e) {}
 	</script>
   <%= csrf_meta_tags %>
+  <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+  <script type="text/javascript">
+	  $(function(){
+		// PREVENT BROWSER BUMP
+		$(window).on('scroll', function(e){
+		   scrollAmount = $(this).scrollTop();
+		   if(scrollAmount < 1){
+		      $(this).scrollTop(1);
+		   }
+		   if(scrollAmount > $(document).height() - $(window).height()){
+		      $(this).scrollTop($(window).height());
+		   }
+		});
+	})
+  </script>
 </head>
 <body>
 

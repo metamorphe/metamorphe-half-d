@@ -1,40 +1,8 @@
-<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-
-<!-- ---------------- Custom Shader Code ------------------------ -->
-<script id="vertexShader" type="x-shader/x-vertex">
-uniform sampler2D bumpTexture;
-uniform float bumpScale;
-
-varying float vAmount;
-varying vec2 vUV;
-
-void main() 
-{ 
-	vUV = uv;
-	vec4 bumpData = texture2D( bumpTexture, uv );
-	
-	vAmount = .2126 * bumpData.r + .7152 * bumpData.g + .0722 * bumpData.b; 
-	// assuming map is grayscale it doesn't matter if you use r, g, or b.
-	
-	// move the position along the normal
-    vec3 newPosition = position + normal * bumpScale * vAmount;
-	
-	gl_Position = projectionMatrix * modelViewMatrix * vec4( newPosition, 1.0 );
-	// console.log("Hello");
-}
-</script>
-
-<!-- fragment shader a.k.a. pixel shader -->
-<script id="fragmentShader" type="x-shader/x-vertex"> 
-void main() 
-{
-	gl_FragColor = vec4(0.2, 0.2, 0.2, 1.0);
-}  
-</script>
-
+<%= render :partial => "shader" %>
 
 <script type="text/javascript">
-var model; 
+var model;
+
 $(function(){
 	var env = new WebEnv($("#ThreeJS"));
 	model = new STLGenerator(env);
@@ -45,17 +13,28 @@ $(function(){
 	engineController.onChange(function(){
 		model.update("soft_engine");
 	});
-
+	var magnitudeController = gui.add(model, 'magnitude', 0, 500);
+	magnitudeController.onFinishChange(function(){
+		model.update("magnitude");
+	});
+	var img = '/heightmap/images/corn.jpg';
+	addImagePreview(env.container, img);
+	model.map(img, 200.0);
 });
 
 
 function STLGenerator(env){
-	this.soft_engine = true;
+	this.texture, this.img, this.textureMaterial;
+
 	this.env = env;
-	this.obj = this.init(1000, 1000, 50);
+	
+	this.soft_engine = true;
+	
+	
+	this.obj = this.init(1000, 1000, 10);
+	this.obj.geometry.original = clone_vec_array(this.obj.geometry.vertices);
+	this.magnitude = 200;
 	this.update("soft_engine");
-	this.texture = STLGenerator.makeTexture('/heightmap/images/heightmap.png', 200.0).uniforms.bumpTexture.value;
-	// STLGenerator.assignUVs(this.obj);
 }
 
 
@@ -76,109 +55,66 @@ STLGenerator.prototype = {
 	// Takes in a texture image, uses ImageUtil to load texture and sample via
 
 	// U/V coordinates, scales to the absolute depth. Stores new vertices in a temporary data structure which toggleTexture Engine uses to reduce render time.
-	map: function(texture, absolute_depth){
-
+	map: function(url, absolute_depth){
+		this.image = url;
+		var texMat =  STLGenerator.makeTexture(url, absolute_depth);
+		this.textureMaterial = texMat.material;
+		this.texture = texMat.uniforms.bumpTexture.value;
+		this.update("soft_engine");
 	}, 
 	update: function (param) {
 		if(param == "soft_engine"){
+			if(typeof this.texture === "undefined") return;
 			if(this[param]){
-				this.obj.material = STLGenerator.textureMaterial;
+				this.obj.geometry.vertices = clone_vec_array(this.obj.geometry.original);
+				this.obj.geometry.verticesNeedUpdate = true;
+				this.obj.material = this.textureMaterial;
+
 			} else{
 				this.obj.material = STLGenerator.lambertMaterial;
+				this.raise(0.1);
+				this.obj.geometry.verticesNeedUpdate = true;
 			}
 		}
+		else if(param == "magnitude"){
+			this.raise(this.magnitude);
+		}
 	},
-	generateSTL: function(){
-
-	}, 
 	raise: function( magnitude ){
+		if( typeof this.texture  === "undefined") return;
 		var geometry = this.obj.geometry;
-	    geometry.computeBoundingBox();
-
-	    var max     = geometry.boundingBox.max;
-	    var min     = geometry.boundingBox.min;
-
-	    var offset  = new THREE.Vector2(0 - min.x, 0 - min.y);
-	    var range   = new THREE.Vector2(max.x - min.x, max.y - min.y);
-
-	    // geometry.faceVertexUvs[0] = [];
+		var vertices = clone_vec_array(this.obj.geometry.original);
 	    var faces = geometry.faces;
+
 	    for (i = 0; i < geometry.faces.length ; i++) {
 
 	      var uv1 = geometry.faceVertexUvs[0][i][0];
-	      var v1 = geometry.vertices[faces[i].a];
+	      var v1 = vertices[faces[i].a];
 	      
 	      var uv2 = geometry.faceVertexUvs[0][i][1];
-	      var v2 = geometry.vertices[faces[i].b];	
+	      var v2 = vertices[faces[i].b];	
 	      
 	      var uv3 = geometry.faceVertexUvs[0][i][2];
-	      var v3 = geometry.vertices[faces[i].c];
+	      var v3 = vertices[faces[i].c];
 
-	      v1.z += this.texture.getUV(uv1) * 0.5;
-	      v2.z += this.texture.getUV(uv2) * 0.5;
-	      v3.z += this.texture.getUV(uv3) * 0.5;
+	      var normal = faces[i].normal;
+	      // console.log(faces[i].normal);
+	      // console.log(v)
+	      v1.z +=  normal.clone().multiplyScalar(this.texture.getUV(uv1) * magnitude).z;
+	      v2.z +=  normal.clone().multiplyScalar(this.texture.getUV(uv2) * magnitude).z;
+	      v3.z +=  normal.clone().multiplyScalar(this.texture.getUV(uv3) * magnitude).z;
+
+	      
     	}
+    	model.obj.geometry.vertices = vertices;
     	model.obj.geometry.verticesNeedUpdate = true;
-	} 
+	} ,
+	generateSTL: function(){
+
+	}, 
 }
 
-THREE.Texture.prototype.calculateRGB = function() {
-	var img = this.image;
-	var canvas = $('canvas#texture-render')[0];
-	canvas.width = img.width;
-	canvas.height = img.height;
-	canvas.getContext('2d').drawImage(img, 0, 0, img.width, img.height);
-	this.imgCanvas = canvas.getContext('2d');
-	this.rgb_calculated = true;
-}
-THREE.Texture.prototype.getUV = function(vec2) {
-	var u = vec2.x;
-	var v = vec2.y;
-	if(u < 0 || u > 1 || v < 0 || v > 1){
-		var err = new Error("Invalid UV coordinates (" + u + ", " + v + ")");
-   		return err.stack;
-	}
-	if(! this.rgb_calculated) this.calculateRGB();
 
-	var img = this.image;
-	var x = u * 1.0 * img.width;
-	var y = v * 1.0 * img.height;
-	
-	// // top-left
-	// var x1 = Math.floor(u * img.width);
-	// var y1 = Math.floor(v * img.height);
-	
-	// // bottom-left
-	// var x2 = Math.ceil(u * img.width);
-	// var y2 = Math.ceil(v * img.height);
-	
-	// var Q11 = this.getGrayPixel(x1, y1);
-	// var Q21 = this.getGrayPixel(x2, y1);
-	// var Q12 = this.getGrayPixel(x1, y2);
-	// var Q22 = this.getGrayPixel(x2, y2);
-
-	// console.log(x1, x, x2, y1, y, y2, Q11, Q21, Q12, Q22);
-	
-  // ###*
-  // # (x1, y1) - coordinates of corner 1 - [Q11]
-  // # (x2, y1) - coordinates of corner 2 - [Q21]
-  // # (x1, y2) - coordinates of corner 3 - [Q12]
-  // # (x2, y2) - coordinates of corner 4 - [Q22]
-  // # 
-  // # (x, y)   - coordinates of interpolation
-  // # 
-  // # Q11      - corner 1
-  // # Q21      - corner 2
-  // # Q12      - corner 3
-  // # Q22      - corner 4
-  // ###
-  return this.getGrayPixel(x, y);
-	// return calcBilinearInterpolant(x1, x, x2, y1, y, y2, Q11, Q21, Q12, Q22)
-}
-THREE.Texture.prototype.getGrayPixel = function(x, y){
-	var val = this.imgCanvas.getImageData(x, y, 1, 1).data;
-	return .2126 * val[0] + .7152 *  val[1] + .0722 *  val[2]; 
-}
 STLGenerator.makeTexture = function(url, magnitude){
 	var bumpTexture = new THREE.ImageUtils.loadTexture(url);
 	bumpTexture.wrapS = bumpTexture.wrapT = THREE.RepeatWrapping; 
@@ -187,34 +123,58 @@ STLGenerator.makeTexture = function(url, magnitude){
 		bumpTexture:	{ type: "t", value: bumpTexture },
 		bumpScale:	    { type: "f", value: bumpScale },
 	};
+
+	var phongShader = THREE.ShaderLib.phong;
+	var uniforms = THREE.UniformsUtils.clone(phongShader.uniforms);
+	uniforms.bumpTexture = { type: "t", value: bumpTexture };
+	uniforms.bumpScale = { type: "f", value: bumpScale };
+	console.log(uniforms);
 	var mat = new THREE.ShaderMaterial({
-		    uniforms: customUniforms,
-			vertexShader:   document.getElementById( 'vertexShader'   ).textContent,
-			fragmentShader: document.getElementById( 'fragmentShader' ).textContent,
+		    uniforms: uniforms,
+			vertexShader:  phongShader.vertexShader, //document.getElementById( 'vertexShader' ).textContent,
+			fragmentShader: phongShader.fragmentShader, //document.getElementById( 'fragmentShader' ).textContent,
+		  	lights:true,
+    		fog: true,
 			side: THREE.DoubleSide
 		});
 	return { material: mat, uniforms: customUniforms}
 }
 
-$(function(){
-	// PREVENT BROWSER BUMP
-	$(window).on('scroll', function(e){
-	   scrollAmount = $(this).scrollTop();
-	   if(scrollAmount < 1){
-	      $(this).scrollTop(1);
-	   }
-	   if(scrollAmount > $(document).height() - $(window).height()){
-	      $(this).scrollTop($(window).height());
-	   }
-	});
-})
+
 
 
 STLGenerator.textureMaterial = STLGenerator.makeTexture('/heightmap/images/heightmap.png', 200.0).material;
-STLGenerator.lambertMaterial = new THREE.MeshBasicMaterial({
-						      color: 0x333333, 
-						      side: THREE.DoubleSide
-						    });
+STLGenerator.lambertMaterial = new THREE.MeshPhongMaterial({
+						        // light
+						        // specular: '#a9fcff',
+						        // intermediate
+						        // color: '#00abb1',
+						        ambient: new THREE.Color( 0xffffff ),
+						        // dark
+						        specular: new THREE.Color( 0x111111 ),
+						        emissive: new THREE.Color( 0x000000 ),
+						        side: THREE.DoubleSide,
+						        shininess: 30
+						      });
+
+							// new THREE.MeshBasicMaterial({
+						 //      color: 0x333333, 
+						 //      side: THREE.DoubleSide
+						 //    });
+function addImagePreview(container, url){
+	var img = new Image();
+	img.src = url;
+	$(img).css({
+		position: "relative", 
+		width: 100,
+		border: "1px solid #00A8E1", 
+		top: - $(container).height(), 
+		left: 0, 
+		"z-index": 100
+	}).appendTo(container);
+	return img;
+}
+
 
 function addStats(container){
 	// STATS

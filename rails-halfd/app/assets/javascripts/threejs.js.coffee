@@ -8,15 +8,19 @@
 //= require KeyboardState
 //= require THREEx.FullScreen
 //= require THREEx.WindowResize
+//= require ShaderLib
+//= require UniformUtils
+//= require metamorphehalf/extend_three
 //= require metamorphehalf/webenv
 //= require dat.gui.min
 
 
-clone_vec_array = (arr) ->
+
+@clone_vec_array = (arr) ->
   clone = []
   for i of arr
-    clone.push arr[i].clone()
-  return
+  	clone.push arr[i].clone()
+  clone
 
 @calcBilinearInterpolant = (x1, x, x2, y1, y, y2, Q11, Q21, Q12, Q22) ->
 

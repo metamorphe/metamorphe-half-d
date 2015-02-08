@@ -1,3 +1,6 @@
+// OBJECTIZED - THREEJS WEBGL SETUP
+// Pass the jquery DOM element that holds the scene. 
+
 function WebEnv(dom){
 	this.container, this.scene, this.camera, this.renderer, this.controls, this.stats;
 	this.keyboard = new KeyboardState();

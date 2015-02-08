@@ -1,131 +1,4 @@
-<!DOCTYPE html>
 <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-
-<script type="text/javascript">
-$(function(){
-	var env = new WebEnv($("#ThreeJS"));
-	var model = new STLGenerator(env);
-});
-
-
-function STLGenerator(env){
-	this.engine = STLGenerator.SoftTexture; 
-	this.env = env;
-	this.init();
-}
-
-STLGenerator.HardTexture = 1; 
-STLGenerator.SoftTexture = 0; 
-
-STLGenerator.prototype = {
-	// Initializes a plane, calculates UV coordinates
-	init: function(){
-		// obj.geometry.soft_vertices = clone_vec_array();
-
-
-		// texture used to generate "bumpiness"
-		var bumpTexture = new THREE.ImageUtils.loadTexture( '/heightmap/images/heightmap.png' );
-		bumpTexture.wrapS = bumpTexture.wrapT = THREE.RepeatWrapping; 
-		// magnitude of normal displacement
-		var bumpScale   = 200.0;
-		
-		customUniforms = {
-			bumpTexture:	{ type: "t", value: bumpTexture },
-			bumpScale:	    { type: "f", value: bumpScale },
-		};
-		
-		// create custom material from the shader code above
-		//   that is within specially labelled script tags
-		var customMaterial = new THREE.ShaderMaterial( 
-		{
-		    uniforms: customUniforms,
-			vertexShader:   document.getElementById( 'vertexShader'   ).textContent,
-			fragmentShader: document.getElementById( 'fragmentShader' ).textContent,
-			side: THREE.DoubleSide
-		}   );
-
-		// create custom material from the shader code above
-		//   that is within specially labelled script tags
-		var customMaterial = new THREE.ShaderMaterial( 
-		{
-		    uniforms: customUniforms,
-			vertexShader:   document.getElementById( 'vertexShader'   ).textContent,
-			fragmentShader: document.getElementById( 'fragmentShader' ).textContent,
-			side: THREE.DoubleSide
-		}   );
-			
-		// var lambert_mat =
-		//   new THREE.MeshPhongMaterial(
-		//     {
-		//       color: 0xDDDDDD
-		//     });
-					
-		var planeGeo = new THREE.PlaneGeometry( 1000, 1000, 100, 100 );
-		var plane = new THREE.Mesh(	planeGeo, customMaterial );
-		plane.rotation.x = -Math.PI / 2;
-		plane.position.y = -100;
-		this.env.scene.add( plane );
-
-	},
-	// Takes in a texture image, uses ImageUtil to load texture and sample via
-	// U/V coordinates, scales to the absolute depth. Stores new vertices in a temporary data structure which toggleTexture Engine uses to reduce render time.
-	map: function(texture, absolute_depth){
-
-	}, 
-	toggleTextureEngine: function(engine){
-		if(engine == STLGenerator.HardTexture){
-			this.obj.geometry = this.obj.hard_vertices;
-		} else if (engine == STLGenerator.SoftTexture){
-			this.obj.geometry = this.obj.soft_vertices;
-		}
-		this.engine = engine; 
-	},
-	assignUVs: function( obj ){
-		var geometry = obj.geometry;
-	    geometry.computeBoundingBox();
-
-	    var max     = geometry.boundingBox.max;
-	    var min     = geometry.boundingBox.min;
-
-	    var offset  = new THREE.Vector2(0 - min.x, 0 - min.y);
-	    var range   = new THREE.Vector2(max.x - min.x, max.y - min.y);
-
-	    geometry.faceVertexUvs[0] = [];
-	    var faces = geometry.faces;
-
-	    for (i = 0; i < geometry.faces.length ; i++) {
-
-	      var v1 = geometry.vertices[faces[i].a];
-	      var v2 = geometry.vertices[faces[i].b];
-	      var v3 = geometry.vertices[faces[i].c];
-
-	      geometry.faceVertexUvs[0].push([
-	        new THREE.Vector2( ( v1.x + offset.x ) / range.x , ( v1.y + offset.y ) / range.y ),
-	        new THREE.Vector2( ( v2.x + offset.x ) / range.x , ( v2.y + offset.y ) / range.y ),
-	        new THREE.Vector2( ( v3.x + offset.x ) / range.x , ( v3.y + offset.y ) / range.y )
-	      ]);
-
-	    }
-
-	    geometry.uvsNeedUpdate = true;
-
-	}, 
-	generateSTL: function(){
-		toggleTextureEngine(STLGenerator.HardTexture);
-	}
-}
-
-function clone_vec_array (arr) {
-	var clone = [];
-	for(var i in arr){
-		clone.push(arr[i].clone());
-	}
-	return 
-}
-</script>
-
-
-
 
 <!-- ---------------- Custom Shader Code ------------------------ -->
 <script id="vertexShader" type="x-shader/x-vertex">
@@ -140,12 +13,14 @@ void main()
 	vUV = uv;
 	vec4 bumpData = texture2D( bumpTexture, uv );
 	
-	vAmount = bumpData.r; // assuming map is grayscale it doesn't matter if you use r, g, or b.
+	vAmount = .2126 * bumpData.r + .7152 * bumpData.g + .0722 * bumpData.b; 
+	// assuming map is grayscale it doesn't matter if you use r, g, or b.
 	
 	// move the position along the normal
     vec3 newPosition = position + normal * bumpScale * vAmount;
 	
 	gl_Position = projectionMatrix * modelViewMatrix * vec4( newPosition, 1.0 );
+	// console.log("Hello");
 }
 </script>
 
@@ -157,9 +32,169 @@ void main()
 }  
 </script>
 
-<div id="ThreeJS" ></div>
 
-<script>
+<script type="text/javascript">
+var model; 
+$(function(){
+	var env = new WebEnv($("#ThreeJS"));
+	model = new STLGenerator(env);
+
+	var gui = new dat.GUI();
+	var engineController = gui.add(model, 'soft_engine');
+
+	engineController.onChange(function(){
+		model.update("soft_engine");
+	});
+
+});
+
+
+function STLGenerator(env){
+	this.soft_engine = true;
+	this.env = env;
+	this.obj = this.init(1000, 1000, 50);
+	this.update("soft_engine");
+	this.texture = STLGenerator.makeTexture('/heightmap/images/heightmap.png', 200.0).uniforms.bumpTexture.value;
+	// STLGenerator.assignUVs(this.obj);
+}
+
+
+STLGenerator.prototype = {
+	// Initializes a plane, calculates UV coordinates
+	init: function(w, h, resolution){
+		var w_segments = parseInt(w / resolution);
+		var h_segments = parseInt(h / resolution);
+
+		// STLGenerator.textureMaterial
+		var planeGeo = new THREE.PlaneGeometry( w, h, w_segments, h_segments) ;
+		var plane = new THREE.Mesh(	planeGeo,  STLGenerator.lambertMaterial);
+		plane.rotation.x = -Math.PI / 2;
+		plane.position.y = -100;
+		this.env.scene.add( plane );
+		return plane;
+	},
+	// Takes in a texture image, uses ImageUtil to load texture and sample via
+
+	// U/V coordinates, scales to the absolute depth. Stores new vertices in a temporary data structure which toggleTexture Engine uses to reduce render time.
+	map: function(texture, absolute_depth){
+
+	}, 
+	update: function (param) {
+		if(param == "soft_engine"){
+			if(this[param]){
+				this.obj.material = STLGenerator.textureMaterial;
+			} else{
+				this.obj.material = STLGenerator.lambertMaterial;
+			}
+		}
+	},
+	generateSTL: function(){
+
+	}, 
+	raise: function( magnitude ){
+		var geometry = this.obj.geometry;
+	    geometry.computeBoundingBox();
+
+	    var max     = geometry.boundingBox.max;
+	    var min     = geometry.boundingBox.min;
+
+	    var offset  = new THREE.Vector2(0 - min.x, 0 - min.y);
+	    var range   = new THREE.Vector2(max.x - min.x, max.y - min.y);
+
+	    // geometry.faceVertexUvs[0] = [];
+	    var faces = geometry.faces;
+	    for (i = 0; i < geometry.faces.length ; i++) {
+
+	      var uv1 = geometry.faceVertexUvs[0][i][0];
+	      var v1 = geometry.vertices[faces[i].a];
+	      
+	      var uv2 = geometry.faceVertexUvs[0][i][1];
+	      var v2 = geometry.vertices[faces[i].b];	
+	      
+	      var uv3 = geometry.faceVertexUvs[0][i][2];
+	      var v3 = geometry.vertices[faces[i].c];
+
+	      v1.z += this.texture.getUV(uv1) * 0.5;
+	      v2.z += this.texture.getUV(uv2) * 0.5;
+	      v3.z += this.texture.getUV(uv3) * 0.5;
+    	}
+    	model.obj.geometry.verticesNeedUpdate = true;
+	} 
+}
+
+THREE.Texture.prototype.calculateRGB = function() {
+	var img = this.image;
+	var canvas = $('canvas#texture-render')[0];
+	canvas.width = img.width;
+	canvas.height = img.height;
+	canvas.getContext('2d').drawImage(img, 0, 0, img.width, img.height);
+	this.imgCanvas = canvas.getContext('2d');
+	this.rgb_calculated = true;
+}
+THREE.Texture.prototype.getUV = function(vec2) {
+	var u = vec2.x;
+	var v = vec2.y;
+	if(u < 0 || u > 1 || v < 0 || v > 1){
+		var err = new Error("Invalid UV coordinates (" + u + ", " + v + ")");
+   		return err.stack;
+	}
+	if(! this.rgb_calculated) this.calculateRGB();
+
+	var img = this.image;
+	var x = u * 1.0 * img.width;
+	var y = v * 1.0 * img.height;
+	
+	// // top-left
+	// var x1 = Math.floor(u * img.width);
+	// var y1 = Math.floor(v * img.height);
+	
+	// // bottom-left
+	// var x2 = Math.ceil(u * img.width);
+	// var y2 = Math.ceil(v * img.height);
+	
+	// var Q11 = this.getGrayPixel(x1, y1);
+	// var Q21 = this.getGrayPixel(x2, y1);
+	// var Q12 = this.getGrayPixel(x1, y2);
+	// var Q22 = this.getGrayPixel(x2, y2);
+
+	// console.log(x1, x, x2, y1, y, y2, Q11, Q21, Q12, Q22);
+	
+  // ###*
+  // # (x1, y1) - coordinates of corner 1 - [Q11]
+  // # (x2, y1) - coordinates of corner 2 - [Q21]
+  // # (x1, y2) - coordinates of corner 3 - [Q12]
+  // # (x2, y2) - coordinates of corner 4 - [Q22]
+  // # 
+  // # (x, y)   - coordinates of interpolation
+  // # 
+  // # Q11      - corner 1
+  // # Q21      - corner 2
+  // # Q12      - corner 3
+  // # Q22      - corner 4
+  // ###
+  return this.getGrayPixel(x, y);
+	// return calcBilinearInterpolant(x1, x, x2, y1, y, y2, Q11, Q21, Q12, Q22)
+}
+THREE.Texture.prototype.getGrayPixel = function(x, y){
+	var val = this.imgCanvas.getImageData(x, y, 1, 1).data;
+	return .2126 * val[0] + .7152 *  val[1] + .0722 *  val[2]; 
+}
+STLGenerator.makeTexture = function(url, magnitude){
+	var bumpTexture = new THREE.ImageUtils.loadTexture(url);
+	bumpTexture.wrapS = bumpTexture.wrapT = THREE.RepeatWrapping; 
+	var bumpScale   = magnitude;		
+	var customUniforms = {
+		bumpTexture:	{ type: "t", value: bumpTexture },
+		bumpScale:	    { type: "f", value: bumpScale },
+	};
+	var mat = new THREE.ShaderMaterial({
+		    uniforms: customUniforms,
+			vertexShader:   document.getElementById( 'vertexShader'   ).textContent,
+			fragmentShader: document.getElementById( 'fragmentShader' ).textContent,
+			side: THREE.DoubleSide
+		});
+	return { material: mat, uniforms: customUniforms}
+}
 
 $(function(){
 	// PREVENT BROWSER BUMP
@@ -175,6 +210,12 @@ $(function(){
 })
 
 
+STLGenerator.textureMaterial = STLGenerator.makeTexture('/heightmap/images/heightmap.png', 200.0).material;
+STLGenerator.lambertMaterial = new THREE.MeshBasicMaterial({
+						      color: 0x333333, 
+						      side: THREE.DoubleSide
+						    });
+
 function addStats(container){
 	// STATS
 	var stats = new Stats();
@@ -185,6 +226,12 @@ function addStats(container){
 	container.appendChild( stats.domElement );
 	return stats;
 }
-
 </script>
 
+<style type="text/css">
+	#texture-render{
+		display: none;
+	}
+</style>
+<div id="ThreeJS" ></div>
+<canvas id="texture-render" ></canvas>

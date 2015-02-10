@@ -1,7 +1,12 @@
 <%= render :partial => "shader" %>
-
+<style type="text/css">
+	html, body{
+		height: 100% !important;
+	}
+</style>
 <script type="text/javascript">
 var model;
+
 
 $(function(){
 	var env = new WebEnv($("#ThreeJS"));
@@ -77,7 +82,8 @@ STLGenerator.prototype = {
 			}
 		}
 		else if(param == "magnitude"){
-			this.raise(this.magnitude);
+			if(! this.soft_engine)
+				this.raise(this.magnitude);
 		}
 	},
 	raise: function( magnitude ){
@@ -168,8 +174,9 @@ function addImagePreview(container, url){
 		position: "relative", 
 		width: 100,
 		border: "1px solid #00A8E1", 
-		top: - $(container).height(), 
+		top: - $(container).height() + 72, 
 		left: 0, 
+		"margin-top": -100,
 		"z-index": 100
 	}).appendTo(container);
 	return img;

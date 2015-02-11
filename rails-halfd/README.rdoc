@@ -1,28 +1,27 @@
 == README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
-
-Things you may want to cover:
-
-* Ruby version
-
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
-
+This contains the code to create a tactile 2.5D model from an image texture. \
+Currently, we only support textures on planar surfaces. 
 
 Please feel free to use a different markup language if you do not plan to run
 <tt>rake doc:app</tt>.
+
+== TODO
+
+=== IMG2STL
+* ADD MAGNITUDE DISPLACEMENT TO BE A VARIABLE PASSED INTO MAG
+* ROTATE THE TEXTURE IMAGE
+* IMAGE CONVERSION TO A POWER OF TWO
+* CONVERT TO A PLANE GEOMETRY
+* EXPORT AS AN STL
+* SWAP OUT TEXTURE FROM LIBRARY
+* UPLOAD NEW TEXTURE
+
+=== REAL WORLD CLASSIFIER
+* GATHER TEXTURES
+* PRINT TEXTURES
+* CREATE ML ROUTINE FROM COVARIANCE DATA
+
+=== INVESTIGATIONS AND EVALUATION
+* EXPERIMENT WITH UI INTERFACES
+* MAKE A BASE MODEL, ITERATE FROM THAT

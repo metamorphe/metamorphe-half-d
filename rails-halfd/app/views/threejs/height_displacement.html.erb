@@ -1,3 +1,5 @@
+
+
 <%= render :partial => "shader" %>
 <style type="text/css">
 	html, body{
@@ -6,6 +8,7 @@
 </style>
 <script type="text/javascript">
 var model;
+var img_preview;
 
 
 $(function(){
@@ -18,27 +21,37 @@ $(function(){
 	engineController.onChange(function(){
 		model.update("soft_engine");
 	});
+
 	var magnitudeController = gui.add(model, 'magnitude', 0, 500);
 	magnitudeController.onFinishChange(function(){
 		model.update("magnitude");
 	});
-	var img = '/heightmap/images/corn.jpg';
-	addImagePreview(env.container, img);
+
+	img = '/heightmap/images/corn.jpg';
+	img_preview = addImagePreview(env.container, img);
 	model.map(img, 200.0);
+});
+
+$(window).resize(function(){
+	console.log("Resized!");
+	THREEx.WindowResize(model.env.renderer, model.env.camera);
 });
 
 
 function STLGenerator(env){
-	this.texture, this.img, this.textureMaterial;
+	this.img, this.shaderMaterial;
 
 	this.env = env;
 	
+	// dat.gui parameterss
 	this.soft_engine = true;
-	
-	
-	this.obj = this.init(1000, 1000, 10);
-	this.obj.geometry.original = clone_vec_array(this.obj.geometry.vertices);
 	this.magnitude = 200;
+	
+	//add obj to the env
+	this.obj = this.init(1000, 1000, 10); // Setup the plane
+	this.obj.geometry.original = clone_vec_array(this.obj.geometry.vertices); //Keep the original geometry
+
+	// begin the render look
 	this.update("soft_engine");
 }
 
@@ -62,32 +75,39 @@ STLGenerator.prototype = {
 	// U/V coordinates, scales to the absolute depth. Stores new vertices in a temporary data structure which toggleTexture Engine uses to reduce render time.
 	map: function(url, absolute_depth){
 		this.image = url;
-		var texMat =  STLGenerator.makeTexture(url, absolute_depth);
-		this.textureMaterial = texMat.material;
-		this.texture = texMat.uniforms.bumpTexture.value;
+		this.shaderMaterial =  STLGenerator.makeShaderTexture(url, absolute_depth); // generates a material and passes back uniforms		
 		this.update("soft_engine");
 	}, 
 	update: function (param) {
 		if(param == "soft_engine"){
-			if(typeof this.texture === "undefined") return;
+			if(typeof this.shaderMaterial === "undefined") return;
 			if(this[param]){
+				// UPDATE GPU ENGINE
 				this.obj.geometry.vertices = clone_vec_array(this.obj.geometry.original);
 				this.obj.geometry.verticesNeedUpdate = true;
-				this.obj.material = this.textureMaterial;
+				this.obj.material = this.shaderMaterial;
 
 			} else{
+				// UPDATE PHYSICAL/CPU ENGINE
 				this.obj.material = STLGenerator.lambertMaterial;
 				this.raise(0.1);
 				this.obj.geometry.verticesNeedUpdate = true;
 			}
 		}
 		else if(param == "magnitude"){
-			if(! this.soft_engine)
+			if(this.soft_engine){
+				// UPDATE THE GPU ENGINE
+				this.shaderMaterial.uniforms.bumpScale.value = this.magnitude;
+				this.obj.geometry.verticesNeedUpdate = true;
+			}
+			else{
+				// UPDATE THE PHYSICAL/CPU ENGINE
 				this.raise(this.magnitude);
+			}
 		}
 	},
 	raise: function( magnitude ){
-		if( typeof this.texture  === "undefined") return;
+		if( typeof this.shaderMaterial  === "undefined") return;
 		var geometry = this.obj.geometry;
 		var vertices = clone_vec_array(this.obj.geometry.original);
 	    var faces = geometry.faces;
@@ -106,11 +126,11 @@ STLGenerator.prototype = {
 	      var normal = faces[i].normal;
 	      // console.log(faces[i].normal);
 	      // console.log(v)
-	      v1.z +=  normal.clone().multiplyScalar(this.texture.getUV(uv1) * magnitude).z;
-	      v2.z +=  normal.clone().multiplyScalar(this.texture.getUV(uv2) * magnitude).z;
-	      v3.z +=  normal.clone().multiplyScalar(this.texture.getUV(uv3) * magnitude).z;
-
-	      
+	      var texture = this.shaderMaterial.uniforms.bumpTexture.value;
+	      v1.add(normal.clone().multiplyScalar(texture.getUV(uv1) * magnitude));
+	      v2.add(normal.clone().multiplyScalar(texture.getUV(uv2) * magnitude));
+	      v3.add(normal.clone().multiplyScalar(texture.getUV(uv3) * magnitude));
+ 
     	}
     	model.obj.geometry.vertices = vertices;
     	model.obj.geometry.verticesNeedUpdate = true;
@@ -121,7 +141,7 @@ STLGenerator.prototype = {
 }
 
 
-STLGenerator.makeTexture = function(url, magnitude){
+STLGenerator.makeShaderTexture = function(url, magnitude){
 	var bumpTexture = new THREE.ImageUtils.loadTexture(url);
 	bumpTexture.wrapS = bumpTexture.wrapT = THREE.RepeatWrapping; 
 	var bumpScale   = magnitude;		
@@ -134,8 +154,8 @@ STLGenerator.makeTexture = function(url, magnitude){
 	var uniforms = THREE.UniformsUtils.clone(phongShader.uniforms);
 	uniforms.bumpTexture = { type: "t", value: bumpTexture };
 	uniforms.bumpScale = { type: "f", value: bumpScale };
-	console.log(uniforms);
-	var mat = new THREE.ShaderMaterial({
+	
+	return new THREE.ShaderMaterial({
 		    uniforms: uniforms,
 			vertexShader:  phongShader.vertexShader, //document.getElementById( 'vertexShader' ).textContent,
 			fragmentShader: phongShader.fragmentShader, //document.getElementById( 'fragmentShader' ).textContent,
@@ -143,13 +163,12 @@ STLGenerator.makeTexture = function(url, magnitude){
     		fog: true,
 			side: THREE.DoubleSide
 		});
-	return { material: mat, uniforms: customUniforms}
 }
 
 
 
 
-STLGenerator.textureMaterial = STLGenerator.makeTexture('/heightmap/images/heightmap.png', 200.0).material;
+STLGenerator.textureMaterial = STLGenerator.makeShaderTexture('/heightmap/images/heightmap.png', 200.0).material;
 STLGenerator.lambertMaterial = new THREE.MeshPhongMaterial({
 						        // light
 						        // specular: '#a9fcff',

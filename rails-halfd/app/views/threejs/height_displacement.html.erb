@@ -23,12 +23,22 @@ $(function(){
 	var engineController = gui.add(model, 'soft_engine');
 
 	engineController.onChange(function(){
+		var start = new Date();  // log start timestamp
 		model.update("soft_engine");
+		var end =  new Date();  // log end timestamp
+		var diff = end - start;
+		var engine = model.soft_engine ? "GPU": "CPU";
+		// console.log("Engine change on ", engine, ":", diff, "ms");
 	});
 
 	var magnitudeController = gui.add(model, 'magnitude', 0, 500);
 	magnitudeController.onFinishChange(function(){
+		var start = new Date();  // log start timestamp
 		model.update("magnitude");
+		var end =  new Date();  // log end timestamp
+		var diff = end - start;
+		var engine = model.soft_engine ? "GPU": "CPU";
+		// console.log("Depth mapping update on ", engine, ":", diff, "ms");
 	});
 
 	img = '/heightmap/images/corn.jpg';
@@ -97,7 +107,7 @@ STLGenerator.prototype = {
 				var self = this;
 				if(typeof this.depth_map === "undefined")
 					this.depth_map = storage.cache(this.image, function(){ 
-						return JSON.stringify(STLGenerator.cacheDepthMap(self.shaderMaterial, self.obj))
+						return STLGenerator.cacheDepthMap(self.shaderMaterial, self.obj)
 					}, function(val){
 						return $.map(val, function(val, i){
 							return new THREE.Vector3(val.x, val.y, val.z);
@@ -122,7 +132,7 @@ STLGenerator.prototype = {
 				var self = this;
 				if(typeof this.depth_map === "undefined")
 					this.depth_map = storage.cache(this.image, function(){ 
-						return JSON.stringify(STLGenerator.cacheDepthMap(self.shaderMaterial, self.obj))
+						return STLGenerator.cacheDepthMap(self.shaderMaterial, self.obj)
 					}, function(val){
 						return $.map(val, function(val, i){
 							return new THREE.Vector3(val.x, val.y, val.z);

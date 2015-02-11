@@ -1,0 +1,16 @@
+
+<%= javascript_include_tag 'd3', 'data-turbolinks-track' => true %>
+
+<%= stylesheet_link_tag    'cooccurrence/cooccurrence', media: 'all', 'data-turbolinks-track' => true %>
+  
+  <aside style="margin-top:80px;">
+  <p>Order: <select id="order">
+    <option value="name">by Name</option>
+    <option value="count">by Frequency</option>
+    <option value="group">by Cluster</option>
+  </select>
+
+  <p>Table 1 of Perceptual dimensions of tactile surface texture</p>
+  </aside>
+
+<%= javascript_include_tag 'cooccurrence/cooccurrence', 'data-turbolinks-track' => true %>

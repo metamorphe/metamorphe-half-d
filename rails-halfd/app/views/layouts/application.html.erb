@@ -28,8 +28,6 @@
   </script>
 </head>
 <body>
-
-<body class='gray'>
 	<nav class="navbar navbar-default" role="navigation">
 	  <div class="container-fluid">
 	    <!-- Brand and toggle get grouped for better mobile display -->
@@ -51,6 +49,7 @@
 	        </li>
 	        <li class="<%= params[:action] == "height-displacement" ? "active" : "" %>">
 	        	<li><%= link_to "pic2stl", pic2stl_path %> </li>
+	        	<li><%= link_to "cooccurrence", cooccurrence_path %> </li>
 	        </li>    	
 	       </ul>
 
@@ -70,7 +69,6 @@
 	
 
 	
-</body>
 <footer class="footer shadow">
   <div class="container">
     <p class="text-muted"> <a href="/"><b>MetaMorphe</b></a>

@@ -1,8 +1,8 @@
-{"nodes":[{"name":"Bark","group":1},{"name":"Brick","group":2},{"name":"Cardboard","group":1},{"name":"Cork","group":3},
-{"name":"Eraser","group":2},{"name":"Felt","group":5},{"name":"Leather","group":2},{"name":"Plastic","group":1},
-{"name":"Sandpaper","group":4},{"name":"Scouring Pad","group":9},{"name":"Sponge","group":1},{"name":"Straw","group":2},
-{"name":"Styrofoam","group":1},{"name":"Tile","group":9},{"name":"Velvet","group":2},{"name":"Wax Paper","group":5},
-{"name":"Wood","group":2}],
+{"nodes":[{"name":"Bark","group":1},{"name":"Brick","group":1},{"name":"Cardboard","group":2},{"name":"Cork","group":2},
+{"name":"Eraser","group":2},{"name":"Felt","group":2},{"name":"Leather","group":2},{"name":"Plastic","group":2},
+{"name":"Sandpaper","group":4},{"name":"Scouring Pad","group":2},{"name":"Sponge","group":1},{"name":"Straw","group":2},
+{"name":"Styrofoam","group":4},{"name":"Tile","group":4},{"name":"Velvet","group":2},{"name":"Wax Paper","group":2},
+{"name":"Wood","group":4}],
 
 "links":[{"source":0,"target":2,"value":0.05}, {"source":0,"target":3,"value":0.1}, {"source":0,"target":4,"value":0.05},
 {"source":0,"target":5,"value":0.05}, {"source":0,"target":7,"value":0.05}, {"source":0,"target":8,"value":0.1},

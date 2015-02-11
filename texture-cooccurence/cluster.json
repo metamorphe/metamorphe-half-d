@@ -3,7 +3,6 @@
 {"name":"Sandpaper","group":4},{"name":"Scouring Pad","group":9},{"name":"Sponge","group":1},{"name":"Straw","group":2},
 {"name":"Styrofoam","group":1},{"name":"Tile","group":9},{"name":"Velvet","group":2},{"name":"Wax Paper","group":5},
 {"name":"Wood","group":2}],
-
 "links":[{"source":2,"target":0,"value":0.05}, {"source":3,"target":0,"value":0.1}, {"source":3,"target":1,"value":0.05}, {"source":3,"target":2,"value":0.3}, {"source":4,"target":0,"value":0.05}, {"source":4,"target":2,"value":0.6}, {"source":4,"target":3,"value":0.55}, {"source":5,"target":0,"value":0.05}, {"source":5,"target":2,"value":0.6}, {"source":5,"target":3,"value":0.6},
 {"source":5,"target":4,"value":0.95}, {"source":6,"target":2,"value":0.8}, {"source":6,"target":3,"value":0.35}, {"source":6,"target":4,"value":0.8},
 {"source":6,"target":5,"value":0.75}, {"source":7,"target":0,"value":0.05}, {"source":7,"target":1,"value":0.05}, {"source":7,"target":2,"value":0.5},

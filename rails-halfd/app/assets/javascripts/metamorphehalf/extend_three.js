@@ -11,6 +11,7 @@ THREE.Texture.prototype.calculateRGB = function() {
 }
 
 
+ // returns the gray pixel at coordinates vec2
 THREE.Texture.prototype.getUV = function(vec2) {
 	var u = vec2.x;
 	var v = vec2.y;
@@ -18,11 +19,19 @@ THREE.Texture.prototype.getUV = function(vec2) {
 		var err = new Error("Invalid UV coordinates (" + u + ", " + v + ")");
    		return err.stack;
 	}
+	if(u < 0.01) u = 0.01; // image overhang adjustment
+	if(v < 0.01) v = 0.01; // image overhang adjustment
+
+
 	if(! this.rgb_calculated) this.calculateRGB();
 
 	var img = this.image;
 	var x = u * 1.0 * img.width;
 	var y = v * 1.0 * img.height;
+
+	// flip vertex
+	x = img.width - x;
+	y = img.height - y;
 	
 	// // top-left
 	// var x1 = Math.floor(u * img.width);

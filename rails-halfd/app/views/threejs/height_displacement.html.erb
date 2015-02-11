@@ -9,11 +9,15 @@
 <script type="text/javascript">
 var model;
 var img_preview;
-
+var storage;
 
 $(function(){
+	storage = new WebStorage();
+
+	
 	var env = new WebEnv($("#ThreeJS"));
 	model = new STLGenerator(env);
+
 
 	var gui = new dat.GUI();
 	var engineController = gui.add(model, 'soft_engine');
@@ -50,6 +54,7 @@ function STLGenerator(env){
 	//add obj to the env
 	this.obj = this.init(1000, 1000, 10); // Setup the plane
 	this.obj.geometry.original = clone_vec_array(this.obj.geometry.vertices); //Keep the original geometry
+
 
 	// begin the render look
 	this.update("soft_engine");
@@ -89,8 +94,20 @@ STLGenerator.prototype = {
 
 			} else{
 				// UPDATE PHYSICAL/CPU ENGINE
+				var self = this;
+				if(typeof this.depth_map === "undefined")
+					this.depth_map = storage.cache(this.image, function(){ 
+						return JSON.stringify(STLGenerator.cacheDepthMap(self.shaderMaterial, self.obj))
+					}, function(val){
+						return $.map(val, function(val, i){
+							return new THREE.Vector3(val.x, val.y, val.z);
+						});
+					});
+				// if(typeof this.depth_map === "undefined")
+				// 	this.depth_map = STLGenerator.cacheDepthMap(this.shaderMaterial, this.obj);
+
 				this.obj.material = STLGenerator.lambertMaterial;
-				this.raise(0.1);
+				this.raise(200/250.0);
 				this.obj.geometry.verticesNeedUpdate = true;
 			}
 		}
@@ -102,36 +119,33 @@ STLGenerator.prototype = {
 			}
 			else{
 				// UPDATE THE PHYSICAL/CPU ENGINE
-				this.raise(this.magnitude);
+				var self = this;
+				if(typeof this.depth_map === "undefined")
+					this.depth_map = storage.cache(this.image, function(){ 
+						return JSON.stringify(STLGenerator.cacheDepthMap(self.shaderMaterial, self.obj))
+					}, function(val){
+						return $.map(val, function(val, i){
+							return new THREE.Vector3(val.x, val.y, val.z);
+						});
+					});
+
+				// if(typeof this.depth_map === "undefined")
+				// 	this.depth_map = STLGenerator.cacheDepthMap(this.shaderMaterial, this.obj);
+				this.raise(this.magnitude/250.0);
 			}
 		}
 	},
 	raise: function( magnitude ){
-		if( typeof this.shaderMaterial  === "undefined") return;
+
+		if( typeof this.depth_map  === "undefined") return;
+
 		var geometry = this.obj.geometry;
 		var vertices = clone_vec_array(this.obj.geometry.original);
-	    var faces = geometry.faces;
+		var depth_map = STLGenerator.adjustDepthMap(this.depth_map, magnitude);
+	    
+	    for(var vertexID in depth_map)
+	    	vertices[vertexID].add(depth_map[vertexID]);
 
-	    for (i = 0; i < geometry.faces.length ; i++) {
-
-	      var uv1 = geometry.faceVertexUvs[0][i][0];
-	      var v1 = vertices[faces[i].a];
-	      
-	      var uv2 = geometry.faceVertexUvs[0][i][1];
-	      var v2 = vertices[faces[i].b];	
-	      
-	      var uv3 = geometry.faceVertexUvs[0][i][2];
-	      var v3 = vertices[faces[i].c];
-
-	      var normal = faces[i].normal;
-	      // console.log(faces[i].normal);
-	      // console.log(v)
-	      var texture = this.shaderMaterial.uniforms.bumpTexture.value;
-	      v1.add(normal.clone().multiplyScalar(texture.getUV(uv1) * magnitude));
-	      v2.add(normal.clone().multiplyScalar(texture.getUV(uv2) * magnitude));
-	      v3.add(normal.clone().multiplyScalar(texture.getUV(uv3) * magnitude));
- 
-    	}
     	model.obj.geometry.vertices = vertices;
     	model.obj.geometry.verticesNeedUpdate = true;
 	} ,
@@ -140,6 +154,47 @@ STLGenerator.prototype = {
 	}, 
 }
 
+STLGenerator.adjustDepthMap = function(depthMap, magnitude){
+	var new_depth = []
+	for(var i in depthMap)
+		new_depth[i] = depthMap[i].clone().multiplyScalar(magnitude);
+	return new_depth;
+}
+
+STLGenerator.cacheDepthMap = function(shaderMaterial, obj){
+	
+	if( typeof shaderMaterial  === "undefined") return;
+	// vertexID ==> normal * grayImagePixel 
+	depthMap = []
+
+		var geometry = obj.geometry;
+		var vertices = clone_vec_array(obj.geometry.original);
+	    var faces = geometry.faces;
+	    var texture = shaderMaterial.uniforms.bumpTexture.value;
+	      
+
+	    for (i = 0; i < geometry.faces.length ; i++) {
+
+	      var uv1 = geometry.faceVertexUvs[0][i][0];
+	      var v1 = vertices[faces[i].a];
+
+	      
+	      var uv2 = geometry.faceVertexUvs[0][i][1];
+	      var v2 = vertices[faces[i].b];	
+	      
+	      var uv3 = geometry.faceVertexUvs[0][i][2];
+	      var v3 = vertices[faces[i].c];
+
+	      var normal = faces[i].normal;
+	    
+	      depthMap[faces[i].a] = normal.clone().multiplyScalar(texture.getUV(uv1));
+	      depthMap[faces[i].b] = normal.clone().multiplyScalar(texture.getUV(uv2));
+	      depthMap[faces[i].c] = normal.clone().multiplyScalar(texture.getUV(uv3));
+ 
+    	}
+   
+    	return depthMap; 
+}
 
 STLGenerator.makeShaderTexture = function(url, magnitude){
 	var bumpTexture = new THREE.ImageUtils.loadTexture(url);

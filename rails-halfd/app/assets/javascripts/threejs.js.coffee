@@ -13,6 +13,7 @@
 //= require metamorphehalf/extend_three
 //= require metamorphehalf/webenv
 //= require dat.gui.min
+//= require metamorphehalf/webcache
 
 
 

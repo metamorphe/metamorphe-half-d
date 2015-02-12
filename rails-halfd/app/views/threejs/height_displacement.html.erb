@@ -1,3 +1,4 @@
+<%= javascript_include_tag 'metamorphehalf/planebox', 'data-turbolinks-track' => true %>
 
 
 <%= render :partial => "shader" %>
@@ -77,13 +78,18 @@ STLGenerator.prototype = {
 		var w_segments = parseInt(w / resolution);
 		var h_segments = parseInt(h / resolution);
 
-		// STLGenerator.textureMaterial
+		STLGenerator.textureMaterial
 		var planeGeo = new THREE.PlaneGeometry( w, h, w_segments, h_segments) ;
 		var plane = new THREE.Mesh(	planeGeo,  STLGenerator.lambertMaterial);
 		plane.rotation.x = -Math.PI / 2;
 		plane.position.y = -100;
 		this.env.scene.add( plane );
+
+		// pb = new PlaneBox(1000, 1000, 200, 10, 10, 10);
+		// this.env.scene.add(pb.mesh);
+		// return pb;
 		return plane;
+	
 	},
 	// Takes in a texture image, uses ImageUtil to load texture and sample via
 
@@ -175,7 +181,7 @@ STLGenerator.cacheDepthMap = function(shaderMaterial, obj){
 	
 	if( typeof shaderMaterial  === "undefined") return;
 	// vertexID ==> normal * grayImagePixel 
-	depthMap = []
+	depthMap = [];
 
 		var geometry = obj.geometry;
 		var vertices = clone_vec_array(obj.geometry.original);

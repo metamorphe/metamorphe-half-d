@@ -1,0 +1,42 @@
+<%= javascript_include_tag 'metamorphehalf/planebox', 'data-turbolinks-track' => true %>
+
+
+<script type="text/javascript">
+var env;
+var pb;
+
+$(function(){
+	
+	env = new WebEnv($("#ThreeJS"));
+    pb = new PlaneBox(1000, 1000, 200, 10, 10, 10);
+   
+	env.scene.add(pb.mesh);
+	var gui = new dat.GUI();
+});
+
+$(window).resize(function(){
+	console.log("Resized!");
+	THREEx.WindowResize(env.renderer, env.camera);
+});
+
+
+function addStats(container){
+	// STATS
+	var stats = new Stats();
+	stats.domElement.style.position = 'relative';
+	stats.domElement.style.top = '-55px';
+	stats.domElement.style.left = '0px';
+	stats.domElement.style.zIndex = 100;
+	container.appendChild( stats.domElement );
+	return stats;
+}
+</script>
+
+<style type="text/css">
+	#texture-render{
+		display: none;
+	}
+</style>
+<div class="threejs_container">
+<div id="ThreeJS" ></div>
+</div>

@@ -1,5 +1,8 @@
 Rails.application.routes.draw do
+
   get 'threejs/height_displacement', :as => "pic2stl"
+  get 'threejs/environment', :as => "three_env"
+  get 'threejs/plane_box', :as => "plane_box"
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

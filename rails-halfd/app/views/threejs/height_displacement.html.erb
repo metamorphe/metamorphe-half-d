@@ -274,6 +274,7 @@ function addStats(container){
 	stats.domElement.style.top = '-55px';
 	stats.domElement.style.left = '0px';
 	stats.domElement.style.zIndex = 100;
+	$(stats.domElement).css("position", "absolute");
 	container.appendChild( stats.domElement );
 	return stats;
 }
@@ -284,5 +285,7 @@ function addStats(container){
 		display: none;
 	}
 </style>
+<div class="threejs_container">
 <div id="ThreeJS" ></div>
+</div>
 <canvas id="texture-render" ></canvas>

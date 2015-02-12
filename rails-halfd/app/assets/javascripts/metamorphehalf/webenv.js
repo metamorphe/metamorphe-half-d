@@ -1,11 +1,25 @@
 // OBJECTIZED - THREEJS WEBGL SETUP
 // Pass the jquery DOM element that holds the scene. 
 
+var lambertMaterial = new THREE.MeshPhongMaterial({
+						        // light
+						        // specular: '#a9fcff',
+						        // intermediate
+						        // color: '#00abb1',
+						        ambient: new THREE.Color( 0xffffff ),
+						        // dark
+						        specular: new THREE.Color( 0x111111 ),
+						        emissive: new THREE.Color( 0x000000 ),
+						        side: THREE.DoubleSide,
+						        shininess: 30
+						      });
+
+
+
 function WebEnv(dom){
 	this.container, this.scene, this.camera, this.renderer, this.controls, this.stats;
 	this.keyboard = new KeyboardState();
 	this.clock = new THREE.Clock();
-	this.mesh = undefined;
 	this.init(dom);
 	this.animate();
 }
@@ -21,8 +35,8 @@ WebEnv.prototype = {
 		this.scene = new THREE.Scene();
 		
 		// CAMERA
-		var SCREEN_WIDTH = $(".container").width(), SCREEN_HEIGHT = $(window).height() - 150;
-		var VIEW_ANGLE = 45, ASPECT = SCREEN_WIDTH / SCREEN_HEIGHT, NEAR = 0.1, FAR = 20000;
+		var SCREEN_WIDTH = $(".threejs_container").width(), SCREEN_HEIGHT = $(window).height();
+		var VIEW_ANGLE = 45, ASPECT = SCREEN_WIDTH / SCREEN_HEIGHT, NEAR = 0.1, FAR = 200000;
 		this.camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR);
 		this.scene.add(this.camera);
 		this.camera.position.set(0,100,400);
@@ -64,10 +78,10 @@ WebEnv.prototype = {
 		this.scene.add(light);
 
 		// SKYBOX
-		var skyBoxGeometry = new THREE.CubeGeometry( 20000, 20000, 10000 );
+		var skyBoxGeometry = new THREE.CubeGeometry( 200000, 200000, 100000 );
 		var skyBoxMaterial = new THREE.MeshBasicMaterial( { color: 0x9999ff, side: THREE.BackSide } );
 		var skyBox = new THREE.Mesh( skyBoxGeometry, skyBoxMaterial );
 		this.scene.add(skyBox);
-		
+		console.log("added sky");
 	}
 }

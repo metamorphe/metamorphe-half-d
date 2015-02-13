@@ -14,6 +14,8 @@
 //= require metamorphehalf/webenv
 //= require dat.gui.min
 //= require metamorphehalf/webcache
+//= require metamorphehalf/write_binary_stl
+//= require metamorphehalf/file_saver.min
 
 
 

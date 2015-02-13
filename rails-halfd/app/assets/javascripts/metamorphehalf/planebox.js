@@ -1,10 +1,10 @@
-function PlaneBox(h, w, d, h_s, w_s, d_s){
+function PlaneBox(h, w, d, h_s, w_s, d_s, material){
 	// TODO DEFAULTIZE h_s, w_s, d_s to 1
-	console.log(h, w, d);
+	console.log(h, w, d, h_s, w_s, d_s);
 	this.depth = d;
 	this.geometry = new THREE.BoxGeometry(h, w, d, h_s, w_s, d_s);
-	this.mesh = new THREE.Mesh(	this.geometry, lambertMaterial);
-	this.material = lambertMaterial;
+	this.mesh = new THREE.Mesh(	this.geometry, material);
+	this.material = material;
 	this.mesh.rotation.x = -Math.PI / 2;
 	this.mesh.position.y = -100;
 }
@@ -32,9 +32,9 @@ PlaneBox.prototype = {
 		var top = this.cacheTop();
 		$.each(top, function(i, el){
 			var vertex = vertices[el]
-			fn(vertex);
+			fn(vertex, el);
 		});
-		geom.verticesNeedUpdate = true;
+		this.geometry.verticesNeedUpdate = true;
 		return true;
 	}
 

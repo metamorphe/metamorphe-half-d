@@ -74,7 +74,11 @@ WebEnv.prototype = {
 	background: function(){	
 		// LIGHT
 		var light = new THREE.PointLight(0xffffff);
-		light.position.set(100,250,100);
+		light.position.set(1000,1000,1000);
+		this.scene.add(light);
+
+		var light = new THREE.PointLight(0xff0000);
+		light.position.set(1000,-1000,1000);
 		this.scene.add(light);
 
 		// SKYBOX

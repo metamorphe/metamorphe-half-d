@@ -304,7 +304,7 @@ THREE.ShaderLib = {
 				
 				// move the position along the normal
 
-		
+			
 				"vec3 displacement = normal * bumpScale * vAmount;",
 				"if(normal.z != 1.0){displacement = vec3(0.0);}",
 			    "vec3 newPosition = position + displacement;", 

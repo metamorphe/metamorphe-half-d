@@ -14,6 +14,7 @@ Please feel free to use a different markup language if you do not plan to run
 * Realworld dimensions to output models (1000 ==> 1000mm)
 * _Optimization_ BILINEAR INTERPOLATION OF POINTS
 * _Optimization_ IMAGE CONVERSION TO A POWER OF TWO
+* _Usability_ Reconfigure lights
 
 * NEIL: _Usability_ SWAP OUT TEXTURE FROM LIBRARY
 * NEIL _Functionality_ UPLOAD/SWITCH NEW TEXTURE

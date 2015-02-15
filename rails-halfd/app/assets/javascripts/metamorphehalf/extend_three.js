@@ -23,6 +23,7 @@ THREE.Texture.prototype.getUV = function(vec2) {
 	if(v < 0.01) v = 0.01; // image overhang adjustment
 
 
+
 	if(! this.rgb_calculated) this.calculateRGB();
 
 	var img = this.image;

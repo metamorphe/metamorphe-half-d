@@ -38,8 +38,9 @@ WebEnv.prototype = {
 		var SCREEN_WIDTH = $(".threejs_container").width(), SCREEN_HEIGHT = $(window).height();
 		var VIEW_ANGLE = 45, ASPECT = SCREEN_WIDTH / SCREEN_HEIGHT, NEAR = 0.1, FAR = 200000;
 		this.camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR);
+		// this.camera = new THREE.OrthographicCamera( - ASPECT * VIEW_SIZE / 2,  ASPECT * VIEW_SIZE / 2,  VIEW_SIZE / 2,  -VIEW_SIZE / 2, -1000, 1000);
 		this.scene.add(this.camera);
-		this.camera.position.set(0,100,400);
+		this.camera.position.set(0, 50, -340);
 		this.camera.lookAt(this.scene.position);	
 		
 		// RENDERER
@@ -86,6 +87,5 @@ WebEnv.prototype = {
 		var skyBoxMaterial = new THREE.MeshBasicMaterial( { color: 0x9999ff, side: THREE.BackSide } );
 		var skyBox = new THREE.Mesh( skyBoxGeometry, skyBoxMaterial );
 		this.scene.add(skyBox);
-		console.log("added sky");
 	}
 }

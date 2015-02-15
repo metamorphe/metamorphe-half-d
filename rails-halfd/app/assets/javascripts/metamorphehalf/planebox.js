@@ -1,9 +1,10 @@
+// DIMENSIONS ARE IN MM
 function PlaneBox(h, w, d, h_s, w_s, d_s, material){
 	// TODO DEFAULTIZE h_s, w_s, d_s to 1
 	console.log(h, w, d, h_s, w_s, d_s);
 	this.depth = d;
 	this.geometry = new THREE.BoxGeometry(h, w, d, h_s, w_s, d_s);
-	this.mesh = new THREE.Mesh(	this.geometry, material);
+	this.mesh = new THREE.Mesh(	this.geometry, material );
 	this.material = material;
 	this.mesh.rotation.x = -Math.PI / 2;
 	this.mesh.position.y = -100;

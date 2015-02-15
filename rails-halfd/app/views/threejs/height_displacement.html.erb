@@ -8,111 +8,91 @@
 	}
 </style>
 <script type="text/javascript">
-var model;
-var img_preview;
-var storage;
+var model, env, img_preview, storage;
+var availableTextures = ['corn.jpg', 'gummy.jpeg', 'gummy_inv.jpg'];
 
 $(function(){
+	var directory = "/heightmap/images/";
+	var init_mag = 20.00;
+	// MUST LOAD MATERIALS AT START -- UTIL TEXTURE BUG
+	materials = {}
+	$.each(availableTextures, function(i, el){
+		materials[el] = STLGenerator.makeShaderTexture(directory + el, init_mag);
+	});
+
+
+
 	storage = new WebStorage();
+	env = new WebEnv($("#ThreeJS"));
+	model = new STLGenerator(env, init_mag);
 
+	configureGUI(model);
 	
-	var env = new WebEnv($("#ThreeJS"));
-	model = new STLGenerator(env);
-
-
-	var gui = new dat.GUI();
-	var engineController = gui.add(model, 'soft_engine');
-
-	engineController.onChange(function(){
-		var start = new Date();  // log start timestamp
-		model.update("soft_engine");
-		var end =  new Date();  // log end timestamp
-		var diff = end - start;
-		var engine = model.soft_engine ? "GPU": "CPU";
-		// console.log("Engine change on ", engine, ":", diff, "ms");
-	});
-
-	var magnitudeController = gui.add(model, 'magnitude', 0, 500);
-	magnitudeController.onFinishChange(function(){
-		var start = new Date();  // log start timestamp
-		model.update("magnitude");
-		var end =  new Date();  // log end timestamp
-		var diff = end - start;
-		var engine = model.soft_engine ? "GPU": "CPU";
-		// console.log("Depth mapping update on ", engine, ":", diff, "ms");
-	});
-
-	// export
-	gui.add(model, 'filename');
-	var exporter = gui.add(model, 'export_as');
-	
-
-	img = '/heightmap/images/gummy.jpeg';
-	img_preview = addImagePreview(env.container, img);
-	model.map(img, 200.0);
-});
-
-$(window).resize(function(){
-	console.log("Resized!");
-	THREEx.WindowResize(model.env.renderer, model.env.camera);
+	model.map(availableTextures[0]); // map first image
+	img_preview = new ImagePreview(env.container, model.directory + model.filename);
 });
 
 
-function STLGenerator(env){
-	this.img, this.shaderMaterial;
+
+
+function STLGenerator(env, init_mag){
+	this.shaderMaterial;
 
 	this.env = env;
-	this.filename = "corn.stl"
-	
-	// dat.gui parameterss
+	this.directory = "/heightmap/images/";
+	this.filename = "corn.stl";
+
+	// dat.gui parameters --> need to caught in the update function
 	this.soft_engine = true;
-	this.magnitude = 200;
+	this.magnitude = init_mag;
 	
 	//add obj to the env
-	this.obj = this.init(1000, 1000, 10); // Setup the plane
+	this.obj = this.init(200, 100, 100.0); // Setup the plane
 	this.obj.geometry.original = clone_vec_array(this.obj.geometry.vertices); //Keep the original geometry
 
 
-	// begin the render look
+	// begin the render loop
 	this.update("soft_engine");
 	var self = this;
-	this.export_as = function(){
-		console.log(self.filename);
-		self.export(self.filename);
+	this.save = function(){
+		var name = this.get_name();
+		self.export(name + ".stl");
 	}
 }
 
 
 STLGenerator.prototype = {
-	// Initializes a plane, calculates UV coordinates
-	init: function(w, h, resolution){
-		var w_segments = parseInt(w / resolution);
-		var h_segments = parseInt(h / resolution);
-
-		// STLGenerator.textureMaterial
-		// var planeGeo = new THREE.PlaneGeometry( w, h, w_segments, h_segments) ;
-		// var plane = new THREE.Mesh(	planeGeo,  STLGenerator.lambertMaterial);
-		// plane.rotation.x = -Math.PI / 2;
-		// plane.position.y = -100;
-		// this.env.scene.add( plane );
-
-		pb = new PlaneBox(1000, 1000, 200, 100, 100, 1, STLGenerator.textureMaterial);
-		this.env.scene.add(pb.mesh);
-		return pb;
-		// return plane;
-	
+	get_name: function(){
+		return this.filename.split('.')[0];
 	},
-	// Takes in a texture image, uses ImageUtil to load texture and sample via
+	// Initializes a plane, calculates UV coordinates
+	init: function(h, w, resolution){
+		var w_seg_size = w / resolution;
+		var h_seg_size = h / resolution;
 
+		var seg_size =  Math.min(w_seg_size, h_seg_size);
+
+		var w_segments = parseInt(w/seg_size);
+		var h_segments = parseInt(h/seg_size);
+
+		pb = new PlaneBox(h, w, 20, h_segments, w_segments, 1, STLGenerator.lambertMaterial);
+		pb.mesh.rotation.x = -Math.PI / 2;
+		pb.mesh.position.y = -100;
+		this.env.scene.add(pb.mesh);
+		return pb;	
+	},
 	// U/V coordinates, scales to the absolute depth. Stores new vertices in a temporary data structure which toggleTexture Engine uses to reduce render time.
-	map: function(url, absolute_depth){
-		this.image = url;
-		this.shaderMaterial =  STLGenerator.makeShaderTexture(url, absolute_depth); // generates a material and passes back uniforms		
+	map: function(img){
+		this.filename = img;
+		this.depth_map = undefined; //remove cache
+		this.shaderMaterial =  materials[img]; // generates a material and passes back uniforms		
 		this.update("soft_engine");
 	}, 
 	update: function (param) {
 		if(param == "soft_engine"){
 			if(typeof this.shaderMaterial === "undefined") return;
+
+		
 			if(this[param]){
 				// UPDATE GPU ENGINE
 				this.obj.geometry.vertices = clone_vec_array(this.obj.geometry.original);
@@ -122,19 +102,20 @@ STLGenerator.prototype = {
 			} else{
 				// UPDATE PHYSICAL/CPU ENGINE
 				var self = this;
-				if(typeof this.depth_map === "undefined")
-					this.depth_map = storage.cache(this.image, function(){ 
+				if(typeof this.depth_map === "undefined"){
+					console.log(this.magnitude);
+					console.log("Retrieving", this.filename);
+					this.depth_map = storage.cache(this.filename, function(){ 
 						return STLGenerator.cacheDepthMap(self.shaderMaterial, self.obj)
 					}, function(val){
 						return $.map(val, function(val, i){
 							return new THREE.Vector3(val.x, val.y, val.z);
 						});
 					});
-				// if(typeof this.depth_map === "undefined")
-				// 	this.depth_map = STLGenerator.cacheDepthMap(this.shaderMaterial, this.obj);
+				}
 
 				this.obj.mesh.material = STLGenerator.lambertMaterial;
-				this.raise(200/250.0);
+				this.raise(this.magnitude/250.0);
 				this.obj.geometry.verticesNeedUpdate = true;
 			}
 		}
@@ -155,9 +136,6 @@ STLGenerator.prototype = {
 							return new THREE.Vector3(val.x, val.y, val.z);
 						});
 					});
-
-				// if(typeof this.depth_map === "undefined")
-				// 	this.depth_map = STLGenerator.cacheDepthMap(this.shaderMaterial, this.obj);
 				this.raise(this.magnitude/250.0);
 			}
 		}
@@ -193,7 +171,9 @@ STLGenerator.adjustDepthMap = function(depthMap, magnitude){
 }
 
 STLGenerator.cacheDepthMap = function(shaderMaterial, obj){
-	
+	console.log("caching");
+	console.log(shaderMaterial);
+
 	if( typeof shaderMaterial  === "undefined") return;
 	// vertexID ==> normal * grayImagePixel 
 	depthMap = [];
@@ -229,7 +209,10 @@ STLGenerator.cacheDepthMap = function(shaderMaterial, obj){
 
 STLGenerator.makeShaderTexture = function(url, magnitude){
 	var bumpTexture = new THREE.ImageUtils.loadTexture(url);
-	bumpTexture.wrapS = bumpTexture.wrapT = THREE.RepeatWrapping; 
+	// bumpTexture.wrapS = bumpTexture.wrapT = THREE.RepeatWrapping; 
+	bumpTexture.wrapS = bumpTexture.wrapT = THREE.ClampToEdgeWrapping; 
+	bumpTexture.minFilter = THREE.LinearFilter;
+	bumpTexture.update();
 	var bumpScale   = magnitude;		
 	var customUniforms = {
 		bumpTexture:	{ type: "t", value: bumpTexture },
@@ -254,38 +237,17 @@ STLGenerator.makeShaderTexture = function(url, magnitude){
 
 
 
-STLGenerator.textureMaterial = STLGenerator.makeShaderTexture('/heightmap/images/heightmap.png', 200.0).material;
+
+
 STLGenerator.lambertMaterial = new THREE.MeshPhongMaterial({
-						        // light
-						        // specular: '#a9fcff',
-						        // intermediate
-						        // color: '#00abb1',
 						        ambient: new THREE.Color( 0xffffff ),
-						        // dark
 						        specular: new THREE.Color( 0x111111 ),
 						        emissive: new THREE.Color( 0x000000 ),
 						        side: THREE.DoubleSide,
 						        shininess: 30
 						      });
 
-							// new THREE.MeshBasicMaterial({
-						 //      color: 0x333333, 
-						 //      side: THREE.DoubleSide
-						 //    });
-function addImagePreview(container, url){
-	var img = new Image();
-	img.src = url;
-	$(img).css({
-		position: "relative", 
-		width: 100,
-		border: "1px solid #00A8E1", 
-		top: - $(container).height() + 72, 
-		left: 0, 
-		"margin-top": -100,
-		"z-index": 100
-	}).appendTo(container);
-	return img;
-}
+					
 
 
 function addStats(container){
@@ -299,6 +261,46 @@ function addStats(container){
 	container.appendChild( stats.domElement );
 	return stats;
 }
+
+function configureGUI(model){
+	var gui = new dat.GUI();
+
+	var texture = gui.add(model, 'filename', availableTextures );
+
+	texture.onChange(function(){
+		model.map(model.filename);
+		img_preview.swap(model.directory + model.filename);
+	});
+
+	var engineController = gui.add(model, 'soft_engine');
+
+	engineController.onChange(function(){
+		var start = new Date();  // log start timestamp
+		model.update("soft_engine");
+		var end =  new Date();  // log end timestamp
+		var diff = end - start;
+		var engine = model.soft_engine ? "GPU": "CPU";
+		// console.log("Engine change on ", engine, ":", diff, "ms");
+	});
+
+	var magnitudeController = gui.add(model, 'magnitude', 0, 500);
+	magnitudeController.onFinishChange(function(){
+		var start = new Date();  // log start timestamp
+		model.update("magnitude");
+		var end =  new Date();  // log end timestamp
+		var diff = end - start;
+		var engine = model.soft_engine ? "GPU": "CPU";
+		// console.log("Depth mapping update on ", engine, ":", diff, "ms");
+	});
+
+	// export
+	var exporter = gui.add(model, 'save');
+}
+
+$(window).resize(function(){
+	console.log("Resized!");
+	THREEx.WindowResize(model.env.renderer, model.env.camera);
+});
 </script>
 
 <style type="text/css">

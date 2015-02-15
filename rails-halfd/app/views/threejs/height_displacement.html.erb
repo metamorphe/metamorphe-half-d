@@ -8,8 +8,8 @@
 	}
 </style>
 <script type="text/javascript">
-var model, env, img_preview, storage;
-var availableTextures = ['corn.jpg', 'gummy.jpeg', 'gummy_inv.jpg'];
+var model, env, img_preview, storage, materials;
+var availableTextures = ['gummy_inv.jpg', 'gummy.jpeg', 'corn.jpg', ];
 
 $(function(){
 	var directory = "/heightmap/images/";
@@ -17,38 +17,43 @@ $(function(){
 	// MUST LOAD MATERIALS AT START -- UTIL TEXTURE BUG
 	materials = {}
 	$.each(availableTextures, function(i, el){
-		materials[el] = STLGenerator.makeShaderTexture(directory + el, init_mag);
+		materials[el] = STLGenerator.makeShaderTexture(directory + el, init_mag, function(){
+			if(i == 1) app_start();
+		});
 	});
 
 
+	
+});
 
+function app_start(){
+	var init_mag = 20.00;
 	storage = new WebStorage();
 	env = new WebEnv($("#ThreeJS"));
-	model = new STLGenerator(env, init_mag);
+	model = new STLGenerator(env, init_mag, materials[availableTextures[0]]);
 
 	configureGUI(model);
 	
 	model.map(availableTextures[0]); // map first image
 	img_preview = new ImagePreview(env.container, model.directory + model.filename);
-});
+};
 
 
-
-
-function STLGenerator(env, init_mag){
+function STLGenerator(env, init_mag, init_img){
 	this.shaderMaterial;
 
 	this.env = env;
 	this.directory = "/heightmap/images/";
 	this.filename = "corn.stl";
+	this.shaderMaterial =  materials[init_img];
 
 	// dat.gui parameters --> need to caught in the update function
-	this.soft_engine = true;
+	this.soft_engine = false;
 	this.magnitude = init_mag;
 	
 	//add obj to the env
-	this.obj = this.init(200, 100, 100.0); // Setup the plane
-	this.obj.geometry.original = clone_vec_array(this.obj.geometry.vertices); //Keep the original geometry
+	this.obj = this.init(200, 200, 100.0); // Setup the plane
+	this.obj.mesh.geometry.original = clone_vec_array(this.obj.mesh.geometry.vertices); //Keep the original geometry
 
 
 	// begin the render loop
@@ -77,6 +82,7 @@ STLGenerator.prototype = {
 
 		pb = new PlaneBox(h, w, 20, h_segments, w_segments, 1, STLGenerator.lambertMaterial);
 		pb.mesh.rotation.x = -Math.PI / 2;
+		pb.mesh.rotation.z = -Math.PI;
 		pb.mesh.position.y = -100;
 		this.env.scene.add(pb.mesh);
 		return pb;	
@@ -95,12 +101,13 @@ STLGenerator.prototype = {
 		
 			if(this[param]){
 				// UPDATE GPU ENGINE
-				this.obj.geometry.vertices = clone_vec_array(this.obj.geometry.original);
-				this.obj.geometry.verticesNeedUpdate = true;
+				this.obj.mesh.geometry.vertices = clone_vec_array(this.obj.mesh.geometry.original);
+				this.obj.mesh.geometry.verticesNeedUpdate = true;
 				this.obj.mesh.material = this.shaderMaterial;
 
 			} else{
 				// UPDATE PHYSICAL/CPU ENGINE
+				this.obj.mesh.material = this.shaderMaterial;
 				var self = this;
 				if(typeof this.depth_map === "undefined"){
 					console.log(this.magnitude);
@@ -116,14 +123,19 @@ STLGenerator.prototype = {
 
 				this.obj.mesh.material = STLGenerator.lambertMaterial;
 				this.raise(this.magnitude/250.0);
-				this.obj.geometry.verticesNeedUpdate = true;
+				this.obj.mesh.geometry.verticesNeedUpdate = true;
+				this.obj.mesh.geometry.computeFaceNormals();
+				this.obj.mesh.geometry.computeVertexNormals();
+				this.obj.mesh.geometry.computeTangents();
+				this.obj.mesh.geometry.computeMorphNormals();
 			}
+			
 		}
 		else if(param == "magnitude"){
 			if(this.soft_engine){
 				// UPDATE THE GPU ENGINE
 				this.shaderMaterial.uniforms.bumpScale.value = this.magnitude;
-				this.obj.geometry.verticesNeedUpdate = true;
+				// this.obj.mesh.geometry.verticesNeedUpdate = true;
 			}
 			else{
 				// UPDATE THE PHYSICAL/CPU ENGINE
@@ -137,6 +149,7 @@ STLGenerator.prototype = {
 						});
 					});
 				this.raise(this.magnitude/250.0);
+				this.obj.mesh.geometry.verticesNeedUpdate = true;
 			}
 		}
 	},
@@ -144,23 +157,31 @@ STLGenerator.prototype = {
 
 		if( typeof this.depth_map  === "undefined") return;
 
-		var geometry = this.obj.geometry;
-		var vertices = clone_vec_array(this.obj.geometry.original);
+		var geometry = this.obj.mesh.geometry;
+		var vertices = clone_vec_array(this.obj.mesh.geometry.original);
 		var depth_map = STLGenerator.adjustDepthMap(this.depth_map, magnitude);
 	    
 	    // for(var vertexID in depth_map) //&& applyToTop
 	    // 	vertices[vertexID].add(depth_map[vertexID]);
 
-	    model.obj.applyToTop(function(vertex, id){
+	    this.obj.applyToTop(function(vertex, id){
 	    	vertex.add(depth_map[id]);
 	    }, vertices);
 
-    	model.obj.geometry.vertices = vertices;
-    	model.obj.geometry.verticesNeedUpdate = true;
+    	this.obj.mesh.geometry.vertices = vertices;
+    	// changes to the vertices
+		// changes to the normals
+		model.obj.mesh.geometry.normalsNeedUpdate = true;
+		this.obj.mesh.geometry.computeFaceNormals();
+		this.obj.mesh.geometry.computeVertexNormals();
 	} ,
 	export: function(filename){
 	    AsciiStlWriter.save(model.obj.geometry, filename);
-	} 
+	} ,
+	test: function(){
+		this.obj.mesh.geometry.computeFaceNormals();
+		this.obj.mesh.geometry.computeVertexNormals();
+	}
 }
 
 STLGenerator.adjustDepthMap = function(depthMap, magnitude){
@@ -178,8 +199,8 @@ STLGenerator.cacheDepthMap = function(shaderMaterial, obj){
 	// vertexID ==> normal * grayImagePixel 
 	depthMap = [];
 
-		var geometry = obj.geometry;
-		var vertices = clone_vec_array(obj.geometry.original);
+		var geometry = obj.mesh.geometry;
+		var vertices = clone_vec_array(obj.mesh.geometry.original);
 	    var faces = geometry.faces;
 	    var texture = shaderMaterial.uniforms.bumpTexture.value;
 	      
@@ -207,11 +228,14 @@ STLGenerator.cacheDepthMap = function(shaderMaterial, obj){
     	return depthMap; 
 }
 
-STLGenerator.makeShaderTexture = function(url, magnitude){
-	var bumpTexture = new THREE.ImageUtils.loadTexture(url);
-	// bumpTexture.wrapS = bumpTexture.wrapT = THREE.RepeatWrapping; 
-	bumpTexture.wrapS = bumpTexture.wrapT = THREE.ClampToEdgeWrapping; 
-	bumpTexture.minFilter = THREE.LinearFilter;
+STLGenerator.makeShaderTexture = function(url, magnitude, ready){
+	var bumpTexture = new THREE.ImageUtils.loadTexture(url, THREE.UVMapping, function(){
+		console.log("Successfully loaded!");
+		ready();
+	});
+	bumpTexture.wrapS = bumpTexture.wrapT = THREE.RepeatWrapping; 
+	// bumpTexture.wrapS = bumpTexture.wrapT = THREE.ClampToEdgeWrapping; 
+	// bumpTexture.minFilter = THREE.LinearFilter;
 	bumpTexture.update();
 	var bumpScale   = magnitude;		
 	var customUniforms = {
@@ -239,12 +263,13 @@ STLGenerator.makeShaderTexture = function(url, magnitude){
 
 
 
-STLGenerator.lambertMaterial = new THREE.MeshPhongMaterial({
-						        ambient: new THREE.Color( 0xffffff ),
-						        specular: new THREE.Color( 0x111111 ),
-						        emissive: new THREE.Color( 0x000000 ),
+STLGenerator.lambertMaterial = new THREE.MeshLambertMaterial({
+						        ambient: new THREE.Color( 0xff0000 ),
+						        color: new THREE.Color( 0xffffff ),
+						        specular: new THREE.Color( 0x00ff00 ),
+						        // emissive: new THREE.Color( 0x0000ff ),
 						        side: THREE.DoubleSide,
-						        shininess: 30
+						        shininess: 0
 						      });
 
 					

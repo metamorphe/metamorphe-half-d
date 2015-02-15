@@ -10,9 +10,24 @@ $(function(){
 	env = new WebEnv($("#ThreeJS"));
 
 	
-    pb = new PlaneBox(1000, 1000, 200, 100, 100, 1);
+    pb = new PlaneBox(100, 100, 20, 10, 10, 1, new THREE.MeshLambertMaterial({
+    	color: new THREE.Color(0xffffff)
+    }));
    
 	env.scene.add(pb.mesh);
+
+	 for(var i in pb.geometry.vertices)
+    	if(i % 4 == 0)
+		    pb.geometry.vertices[i].z += 10;
+    pb.geometry.verticesNeedUpdate = true;
+	// pb.geometry.elementsNeedUpdate = true;
+	// pb.geometry.morphTargetsNeedUpdate = true;
+	// pb.geometry.uvsNeedUpdate = true;
+	// pb.geometry.normalsNeedUpdate = true;
+	// pb.geometry.colorsNeedUpdate = true;
+	// pb.geometry.tangentsNeedUpdate = true;
+	pb.geometry.computeFaceNormals();
+	pb.geometry.computeVertexNormals();
 	var gui = new dat.GUI();
 });
 

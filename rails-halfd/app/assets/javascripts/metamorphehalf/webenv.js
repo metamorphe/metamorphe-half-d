@@ -74,13 +74,17 @@ WebEnv.prototype = {
 	}, 
 	background: function(){	
 		// LIGHT
-		var light = new THREE.PointLight(0xffffff);
-		light.position.set(1000,1000,1000);
-		this.scene.add(light);
+		// var light = new THREE.PointLight(0xffffff);
+		// light.position.set(1000,1000,1000);
+		// this.scene.add(light);
 
-		var light = new THREE.PointLight(0xff0000);
-		light.position.set(1000,-1000,1000);
-		this.scene.add(light);
+		// var light = new THREE.PointLight(0xffffff);
+		// light.position.set(0, 100, -340);
+		// this.scene.add(light);
+
+		var directionalLight = new THREE.DirectionalLight(0xFFFFFF);
+      	 directionalLight.position.set(1, 1, 1).normalize();
+      	this.scene.add(directionalLight);
 
 		// SKYBOX
 		var skyBoxGeometry = new THREE.CubeGeometry( 200000, 200000, 100000 );

@@ -9,7 +9,7 @@
 </style>
 <script type="text/javascript">
 var model, env, img_preview, storage, materials;
-var availableTextures = ["bumps.png",'gummy_inv.jpg', 'gummy.jpeg', 'corn.jpg'];
+var availableTextures = <%= @files %>;
 
 $(function(){
 	var directory = "/heightmap/images/";
@@ -308,7 +308,7 @@ function configureGUI(model){
 		// console.log("Engine change on ", engine, ":", diff, "ms");
 	});
 
-	var magnitudeController = gui.add(model, 'magnitude', 0, 50);
+	var magnitudeController = gui.add(model, 'magnitude', 0, 30);
 	magnitudeController.onFinishChange(function(){
 		var start = new Date();  // log start timestamp
 		model.update("magnitude");

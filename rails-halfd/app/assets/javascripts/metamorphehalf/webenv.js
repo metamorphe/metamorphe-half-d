@@ -30,6 +30,8 @@ WebEnv.prototype = {
 		this.container = this.setup(containerDOM);	
 		this.stats = addStats(this.container);
 		this.background();
+
+	
 	}, 
 	setup: function(container){
 		this.scene = new THREE.Scene();
@@ -55,6 +57,13 @@ WebEnv.prototype = {
 		
 		// CONTROLS
 		this.controls = new THREE.OrbitControls( this.camera, this.renderer.domElement );
+
+
+		// FULLSCREEN
+		$(window).resize(function(){
+			console.log("Resized!");
+			THREEx.WindowResize(this.renderer, this.camera);
+		});
 		return container;
 	},
 	animate: function()	{
@@ -92,4 +101,16 @@ WebEnv.prototype = {
 		var skyBox = new THREE.Mesh( skyBoxGeometry, skyBoxMaterial );
 		this.scene.add(skyBox);
 	}
+}
+
+function addStats(container){
+	// STATS
+	var stats = new Stats();
+	stats.domElement.style.position = 'relative';
+	stats.domElement.style.top = '-55px';
+	stats.domElement.style.left = '0px';
+	stats.domElement.style.zIndex = 100;
+	$(stats.domElement).css("position", "absolute");
+	container.appendChild( stats.domElement );
+	return stats;
 }

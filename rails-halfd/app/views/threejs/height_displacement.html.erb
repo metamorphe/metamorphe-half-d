@@ -8,324 +8,124 @@
 	}
 </style>
 <script type="text/javascript">
-var model, env, img_preview, storage, materials;
-var availableTextures = <%= @files %>;
-
+var tc;
 $(function(){
-	var directory = "/heightmap/images/";
-	var init_mag = 20.00;
-	// MUST LOAD MATERIALS AT START -- UTIL TEXTURE BUG
-	materials = {}
-	$.each(availableTextures, function(i, el){
-		materials[el] = STLGenerator.makeShaderTexture(directory + el, init_mag, function(){
-			if(i == 1) app_start();
-		});
-	});
+	tc = new TactileController();
+	configureGUI(tc);
+})
+function TactileController(){
+	this.texture = "";
+	this.current_model;
+	this.magnitude = 20.0;
+	this.loaded = {};
+	this.storage = new WebStorage();
+	this.env = new WebEnv($("#ThreeJS"));
+	this.engine = "bump";
 
-
-	
-});
-
-function app_start(){
-	var init_mag = 20.00;
-	storage = new WebStorage();
-	env = new WebEnv($("#ThreeJS"));
-	model = new STLGenerator(env, init_mag, materials[availableTextures[0]]);
-
-	configureGUI(model);
-	
-	model.map(availableTextures[0]); // map first image
-	img_preview = new ImagePreview(env.container, model.directory + model.filename);
-};
-
-
-function STLGenerator(env, init_mag, init_img){
-	this.shaderMaterial;
-
-	this.env = env;
-	this.directory = "/heightmap/images/";
-	this.filename = "corn.stl";
-	this.shaderMaterial =  materials[init_img];
-
-	// dat.gui parameters --> need to caught in the update function
-	this.soft_engine = false;
-	this.magnitude = init_mag;
-	
-	//add obj to the env
-	this.obj = this.init(200, 200, 100.0); // Setup the plane
-	this.obj.mesh.geometry.original = clone_vec_array(this.obj.mesh.geometry.vertices); //Keep the original geometry
-
-
-	// begin the render loop
-	this.update("soft_engine");
-	var self = this;
-	this.save = function(){
-		var name = this.get_name();
-		self.export(name + ".stl");
-	}
+	this.init();
 }
 
+TactileController.textures =  <%= @files %>;
 
-STLGenerator.prototype = {
-	get_name: function(){
-		return this.filename.split('.')[0];
+TactileController.prototype = {
+	init: function(){
+		var self = this;
+		this.texture = TactileController.textures[0];
+		this.load();
 	},
-	// Initializes a plane, calculates UV coordinates
-	init: function(h, w, resolution){
-		var w_seg_size = w / resolution;
-		var h_seg_size = h / resolution;
+	load:function(){
+		console.log("Loading", this.texture, "on", this.engine);
+		var self = this;
 
-		var seg_size =  Math.min(w_seg_size, h_seg_size);
-
-		var w_segments = parseInt(w/seg_size);
-		var h_segments = parseInt(h/seg_size);
-
-		pb = new PlaneBox(h, w, 2, h_segments, w_segments, 1, STLGenerator.lambertMaterial);
-		pb.mesh.rotation.x = -Math.PI / 2;
-		pb.mesh.rotation.z = -Math.PI;
-		pb.mesh.position.y = -100;
-		this.env.scene.add(pb.mesh);
-		return pb;	
+		var model = this.loaded[this.texture];
+		if(typeof model === "undefined") model = new TactileModel(this.texture, 100, 100, 5, 100);
+		this.current_model = model;
+		model.load(this.engine, this.add, self);
 	},
-	// U/V coordinates, scales to the absolute depth. Stores new vertices in a temporary data structure which toggleTexture Engine uses to reduce render time.
-	map: function(img){
-		this.filename = img;
-		this.depth_map = undefined; //remove cache
-		this.shaderMaterial =  materials[img]; // generates a material and passes back uniforms		
-		this.update("soft_engine");
+	add: function(tc, model){
+		console.log("Added " + model.name);
+		tc.env.scene.add(model[tc.engine]);
+		tc.mag();
 	}, 
-	update: function (param) {
-		if(param == "soft_engine"){
-			if(typeof this.shaderMaterial === "undefined") return;
-
-		
-			if(this[param]){
-				// UPDATE GPU ENGINE
-				this.obj.mesh.geometry.vertices = clone_vec_array(this.obj.mesh.geometry.original);
-				this.obj.mesh.geometry.verticesNeedUpdate = true;
-				this.obj.mesh.material = this.shaderMaterial;
-
-			} else{
-				// UPDATE PHYSICAL/CPU ENGINE
-				this.obj.mesh.material = this.shaderMaterial;
-				var self = this;
-				if(typeof this.depth_map === "undefined"){
-					console.log(this.magnitude);
-					console.log("Retrieving", this.filename);
-					this.depth_map = storage.cache(this.filename, function(){ 
-						return STLGenerator.cacheDepthMap(self.shaderMaterial, self.obj)
-					}, function(val){
-						return $.map(val, function(val, i){
-							return new THREE.Vector3(val.x, val.y, val.z);
-						});
-					});
-				}
-
-				this.obj.mesh.material = STLGenerator.lambertMaterial;
-				this.raise(this.magnitude/250.0);
-				this.obj.mesh.geometry.verticesNeedUpdate = true;
-				this.obj.mesh.geometry.computeFaceNormals();
-				this.obj.mesh.geometry.computeVertexNormals();
-				this.obj.mesh.geometry.computeTangents();
-				this.obj.mesh.geometry.computeMorphNormals();
-			}
-			
-		}
-		else if(param == "magnitude"){
-			if(this.soft_engine){
-				// UPDATE THE GPU ENGINE
-				this.shaderMaterial.uniforms.bumpScale.value = this.magnitude;
-				// this.obj.mesh.geometry.verticesNeedUpdate = true;
-			}
-			else{
-				// UPDATE THE PHYSICAL/CPU ENGINE
-				var self = this;
-				if(typeof this.depth_map === "undefined")
-					this.depth_map = storage.cache(this.image, function(){ 
-						return STLGenerator.cacheDepthMap(self.shaderMaterial, self.obj)
-					}, function(val){
-						return $.map(val, function(val, i){
-							return new THREE.Vector3(val.x, val.y, val.z);
-						});
-					});
-				this.raise(this.magnitude/250.0);
-				this.obj.mesh.geometry.verticesNeedUpdate = true;
-			}
-		}
+	switch: function(){
+		console.log("Switching to", this.texture);
+		var self = this;
+		this.clear();
+		this.load(this.texture);
 	},
-	raise: function( magnitude ){
+	mag: function(){
+		this.current_model.mag(this.engine, this.magnitude);
+	},
+	clear: function(){
+		console.log("Cleared the stage.");
+		this.env.scene.remove(this.current_model[this.engine]);
+	}, 
+	save: function(){
+		// TODO: trigger change with controller
+		this.engine = "bump";
+		tc.switch();
+		var self = this;
+		this.current_model.save(function(){
+			console.log("Saving", self.current_model.name);			
+		});
 
-		if( typeof this.depth_map  === "undefined") return;
-
-		var geometry = this.obj.mesh.geometry;
-		var vertices = clone_vec_array(this.obj.mesh.geometry.original);
-		var depth_map = STLGenerator.adjustDepthMap(this.depth_map, magnitude);
-	    
-	    // for(var vertexID in depth_map) //&& applyToTop
-	    // 	vertices[vertexID].add(depth_map[vertexID]);
-
-	    this.obj.applyToTop(function(vertex, id){
-	    	vertex.add(depth_map[id]);
-	    }, vertices);
-
-    	this.obj.mesh.geometry.vertices = vertices;
-    	// changes to the vertices
-		// changes to the normals
-		model.obj.mesh.geometry.normalsNeedUpdate = true;
-		this.obj.mesh.geometry.computeFaceNormals();
-		this.obj.mesh.geometry.computeVertexNormals();
-	} ,
-	export: function(filename){
-	    AsciiStlWriter.save(model.obj.mesh.geometry, filename);
-	} ,
-	test: function(){
-		this.obj.mesh.geometry.computeFaceNormals();
-		this.obj.mesh.geometry.computeVertexNormals();
 	}
 }
 
-STLGenerator.adjustDepthMap = function(depthMap, magnitude){
-	var new_depth = []
-	for(var i in depthMap)
-		new_depth[i] = depthMap[i].clone().multiplyScalar(magnitude);
-	return new_depth;
-}
 
-STLGenerator.cacheDepthMap = function(shaderMaterial, obj){
-	console.log("caching");
-	console.log(shaderMaterial);
-
-	if( typeof shaderMaterial  === "undefined") return;
-	// vertexID ==> normal * grayImagePixel 
-	depthMap = [];
-
-		var geometry = obj.mesh.geometry;
-		var vertices = clone_vec_array(obj.mesh.geometry.original);
-	    var faces = geometry.faces;
-	    var texture = shaderMaterial.uniforms.bumpTexture.value;
-	      
-
-	    for (i = 0; i < geometry.faces.length ; i++) {
-
-	      var uv1 = geometry.faceVertexUvs[0][i][0];
-	      var v1 = vertices[faces[i].a];
-
-	      
-	      var uv2 = geometry.faceVertexUvs[0][i][1];
-	      var v2 = vertices[faces[i].b];	
-	      
-	      var uv3 = geometry.faceVertexUvs[0][i][2];
-	      var v3 = vertices[faces[i].c];
-
-	      var normal = faces[i].normal;
-	    
-	      depthMap[faces[i].a] = normal.clone().multiplyScalar(texture.getUV(uv1));
-	      depthMap[faces[i].b] = normal.clone().multiplyScalar(texture.getUV(uv2));
-	      depthMap[faces[i].c] = normal.clone().multiplyScalar(texture.getUV(uv3));
- 
-    	}
-   
-    	return depthMap; 
-}
-
-STLGenerator.makeShaderTexture = function(url, magnitude, ready){
-	var bumpTexture = new THREE.ImageUtils.loadTexture(url, THREE.UVMapping, function(){
-		console.log("Successfully loaded!");
-		ready();
+function TactileModel(texture, h, w, d, resolution){
+	this.name = texture.split(".")[0];
+	this.path = texture;
+	var geomA = new THREE.BoxGeometry(50, 100, 50, 1, 1, 1);
+	var geomB = new THREE.BoxGeometry(50, 50, 100, 1, 1, 1);
+	var matA = new THREE.MeshLambertMaterial({
+		color: new THREE.Color(0xffffff)
 	});
-	bumpTexture.wrapS = bumpTexture.wrapT = THREE.RepeatWrapping; 
-	// bumpTexture.wrapS = bumpTexture.wrapT = THREE.ClampToEdgeWrapping; 
-	// bumpTexture.minFilter = THREE.LinearFilter;
-	bumpTexture.update();
-	var bumpScale   = magnitude;		
-	var customUniforms = {
-		bumpTexture:	{ type: "t", value: bumpTexture },
-		bumpScale:	    { type: "f", value: bumpScale },
-	};
+	var matB = new THREE.MeshLambertMaterial({
+		color: new THREE.Color(0xff00ff)
+	});
+	this.shade = new THREE.Mesh(geomA, matA); //TactileGenerator("shader", texture, h, w, d, h_s, w_s);
+	this.bump = new THREE.Mesh(geomB, matB); //TactileGenerator("bump_map", texture, h, w, d, h_s, w_s);
 
-	var phongShader = THREE.ShaderLib.phong;
-	var uniforms = THREE.UniformsUtils.clone(phongShader.uniforms);
-	uniforms.bumpTexture = { type: "t", value: bumpTexture };
-	uniforms.bumpScale = { type: "f", value: bumpScale };
-	
-	return new THREE.ShaderMaterial({
-		    uniforms: uniforms,
-			vertexShader:  phongShader.vertexShader, //document.getElementById( 'vertexShader' ).textContent,
-			fragmentShader: phongShader.fragmentShader, //document.getElementById( 'fragmentShader' ).textContent,
-		  	lights:true,
-    		fog: true,
-			side: THREE.DoubleSide
-		});
 }
 
-
-
-
-
-
-STLGenerator.lambertMaterial = new THREE.MeshLambertMaterial({
-						        ambient: new THREE.Color( 0xff0000 ),
-						        color: new THREE.Color( 0xffffff ),
-						        specular: new THREE.Color( 0x00ff00 ),
-						        // emissive: new THREE.Color( 0x0000ff ),
-						        side: THREE.DoubleSide,
-						        shininess: 0
-						      });
-
-					
-
-
-function addStats(container){
-	// STATS
-	var stats = new Stats();
-	stats.domElement.style.position = 'relative';
-	stats.domElement.style.top = '-55px';
-	stats.domElement.style.left = '0px';
-	stats.domElement.style.zIndex = 100;
-	$(stats.domElement).css("position", "absolute");
-	container.appendChild( stats.domElement );
-	return stats;
+TactileModel.prototype = {
+	load: function(engine, fn, tc){
+		// load routine for model
+		// this[engine].load(fn);
+		console.log("Passing back", engine, this.name);
+		fn(tc, this);
+	}, 
+	mag: function(engine, mag){
+		this[engine].position.x = mag;
+	},
+	save: function(fn){
+		console.log("Saved!");
+		fn();
+	}
 }
 
-function configureGUI(model){
+function configureGUI(tc){
 	var gui = new dat.GUI();
 
-	var texture = gui.add(model, 'filename', availableTextures );
+	var texture = gui.add(tc, 'texture', TactileController.textures );
 
 	texture.onChange(function(){
-		model.map(model.filename);
-		img_preview.swap(model.directory + model.filename);
+		tc.switch();
+		// model.map(model.filename);
+		// img_preview.swap(model.directory + model.filename);
 	});
 
-	var engineController = gui.add(model, 'soft_engine');
+	var engineController = gui.add(tc, 'engine', ["shade", "bump"]);
+	engineController.onChange(function(){ tc.switch(); });
 
-	engineController.onChange(function(){
-		var start = new Date();  // log start timestamp
-		model.update("soft_engine");
-		var end =  new Date();  // log end timestamp
-		var diff = end - start;
-		var engine = model.soft_engine ? "GPU": "CPU";
-		// console.log("Engine change on ", engine, ":", diff, "ms");
-	});
-
-	var magnitudeController = gui.add(model, 'magnitude', 0, 30);
-	magnitudeController.onFinishChange(function(){
-		var start = new Date();  // log start timestamp
-		model.update("magnitude");
-		var end =  new Date();  // log end timestamp
-		var diff = end - start;
-		var engine = model.soft_engine ? "GPU": "CPU";
-		// console.log("Depth mapping update on ", engine, ":", diff, "ms");
-	});
+	var magnitudeController = gui.add(tc, 'magnitude', 0, 30);
+	magnitudeController.onFinishChange(function(){ tc.mag(); });
 
 	// export
-	var exporter = gui.add(model, 'save');
+	var exporter = gui.add(tc, 'save');
 }
 
-$(window).resize(function(){
-	console.log("Resized!");
-	THREEx.WindowResize(model.env.renderer, model.env.camera);
-});
 </script>
 
 <style type="text/css">

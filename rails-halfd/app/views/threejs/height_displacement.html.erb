@@ -8,21 +8,24 @@
 	}
 </style>
 <script type="text/javascript">
-var tc;
+var tc, storage;
 $(function(){
+	storage = new WebStorage();
 	tc = new TactileController();
 	configureGUI(tc);
-})
+	tc.init();
+});
+
+
 function TactileController(){
-	this.texture = "";
+	this.texture = "corn";
+
 	this.current_model;
 	this.magnitude = 20.0;
 	this.loaded = {};
-	this.storage = new WebStorage();
 	this.env = new WebEnv($("#ThreeJS"));
-	this.engine = "bump";
-
-	this.init();
+	this.engine = "shade";
+	this.preview = new ImagePreview(this.env.container, textureMap[this.texture]);
 }
 
 TactileController.textures =  <%= @files %>;
@@ -30,7 +33,6 @@ TactileController.textures =  <%= @files %>;
 TactileController.prototype = {
 	init: function(){
 		var self = this;
-		this.texture = TactileController.textures[0];
 		this.load();
 	},
 	load:function(){
@@ -38,77 +40,86 @@ TactileController.prototype = {
 		var self = this;
 
 		var model = this.loaded[this.texture];
-		if(typeof model === "undefined") model = new TactileModel(this.texture, 100, 100, 5, 100);
+		if(typeof model === "undefined") model = new TactileModel(textureMap[this.texture], 
+			100, 100, 5, 100, self.magnitude);
 		this.current_model = model;
 		model.load(this.engine, this.add, self);
 	},
 	add: function(tc, model){
 		console.log("Added " + model.name);
-		tc.env.scene.add(model[tc.engine]);
+		tc.env.scene.add(model[tc.engine].obj.mesh);
+		tc.preview.swap(textureMap[tc.texture]);
 		tc.mag();
 	}, 
 	switch: function(){
-		console.log("Switching to", this.texture);
+		console.log("Switching to", textureMap[this.texture]);
 		var self = this;
+		console.log(this.current_model);
 		this.clear();
-		this.load(this.texture);
+		this.load();
 	},
 	mag: function(){
 		this.current_model.mag(this.engine, this.magnitude);
 	},
 	clear: function(){
 		console.log("Cleared the stage.");
-		this.env.scene.remove(this.current_model[this.engine]);
+		if(typeof this.current_model.bump.obj !== "undefined")
+			this.env.scene.remove(this.current_model.bump.obj.mesh);
+		if(typeof this.current_model.shade.obj !== "undefined")
+			this.env.scene.remove(this.current_model.shade.obj.mesh);
 	}, 
 	save: function(){
 		// TODO: trigger change with controller
-		this.engine = "bump";
-		tc.switch();
+		// this.engine = "bump";
+		// tc.switch();
 		var self = this;
-		this.current_model.save(function(){
-			console.log("Saving", self.current_model.name);			
-		});
-
+		this.current_model.save(this.texture);
 	}
 }
 
 
-function TactileModel(texture, h, w, d, resolution){
-	this.name = texture.split(".")[0];
-	this.path = texture;
-	var geomA = new THREE.BoxGeometry(50, 100, 50, 1, 1, 1);
-	var geomB = new THREE.BoxGeometry(50, 50, 100, 1, 1, 1);
-	var matA = new THREE.MeshLambertMaterial({
-		color: new THREE.Color(0xffffff)
-	});
-	var matB = new THREE.MeshLambertMaterial({
-		color: new THREE.Color(0xff00ff)
-	});
-	this.shade = new THREE.Mesh(geomA, matA); //TactileGenerator("shader", texture, h, w, d, h_s, w_s);
-	this.bump = new THREE.Mesh(geomB, matB); //TactileGenerator("bump_map", texture, h, w, d, h_s, w_s);
-
+function TactileModel(texture, h, w, d, resolution, mag){
+	console.log(texture);
+	this.name = texture;
+	this.path = textureMap[texture];
+	this.shade = new ShaderBumpBox(texture, mag);   
+	this.bump = new LambertBumpBox(texture, mag);
 }
 
 TactileModel.prototype = {
 	load: function(engine, fn, tc){
 		// load routine for model
-		// this[engine].load(fn);
-		console.log("Passing back", engine, this.name);
-		fn(tc, this);
+		var self = this;
+		this[engine].load(function(){
+			console.log("Passing back", engine, self.name);	
+			fn(tc, self);
+		});
 	}, 
 	mag: function(engine, mag){
-		this[engine].position.x = mag;
+		// this[engine].position.x = mag;
+		this[engine].raise(mag);
 	},
-	save: function(fn){
+	save: function(name){
 		console.log("Saved!");
-		fn();
+		this.bump.save(name);
 	}
 }
+var textureNames = $.map(TactileController.textures, function(el, i){
+			var path_tokens = el.split('/');
+			return path_tokens[path_tokens.length - 1].split(".")[0];
+		});
+var textureMap = {};
 
 function configureGUI(tc){
+	$.each(TactileController.textures, function(i, el){
+			var path_tokens = el.split('/');
+			var name = path_tokens[path_tokens.length - 1].split(".")[0];
+			textureMap[name] = el;
+	});
+
 	var gui = new dat.GUI();
 
-	var texture = gui.add(tc, 'texture', TactileController.textures );
+	var texture = gui.add(tc, 'texture', textureNames);
 
 	texture.onChange(function(){
 		tc.switch();
@@ -120,7 +131,7 @@ function configureGUI(tc){
 	engineController.onChange(function(){ tc.switch(); });
 
 	var magnitudeController = gui.add(tc, 'magnitude', 0, 30);
-	magnitudeController.onFinishChange(function(){ tc.mag(); });
+	magnitudeController.onChange(function(){ tc.mag(); });
 
 	// export
 	var exporter = gui.add(tc, 'save');

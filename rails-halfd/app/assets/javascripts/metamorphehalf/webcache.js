@@ -29,6 +29,7 @@ WebStorage.prototype = {
 		return this.get(k);
 	},
 	set: function(k, v){
+		if(typeof k === "undefined") return; // don't store undefined
 		if(!this.check_valid) return;
 		this.store.setItem(k, v)
 	}, 

@@ -1,19 +1,19 @@
 <%= javascript_include_tag 'metamorphehalf/planebox', 'data-turbolinks-track' => true %>
 
 
-<%= render :partial => "shader" %>
 <style type="text/css">
 	html, body{
 		height: 100% !important;
 	}
 </style>
 <script type="text/javascript">
-var tc, storage;
+var tc, storage, alert;
 $(function(){
 	storage = new WebStorage();
 	tc = new TactileController();
 	configureGUI(tc);
 	tc.init();
+	alert = new UIAlert(tc.env.container);
 });
 
 
@@ -26,6 +26,7 @@ function TactileController(){
 	this.env = new WebEnv($("#ThreeJS"));
 	this.engine = "shade";
 	this.preview = new ImagePreview(this.env.container, textureMap[this.texture]);
+
 }
 
 TactileController.textures =  <%= @files %>;
@@ -50,11 +51,11 @@ TactileController.prototype = {
 		tc.env.scene.add(model[tc.engine].obj.mesh);
 		tc.preview.swap(textureMap[tc.texture]);
 		tc.mag();
+		alert.hide();
 	}, 
 	switch: function(){
 		console.log("Switching to", textureMap[this.texture]);
 		var self = this;
-		console.log(this.current_model);
 		this.clear();
 		this.load();
 	},
@@ -79,7 +80,6 @@ TactileController.prototype = {
 
 
 function TactileModel(texture, h, w, d, resolution, mag){
-	console.log(texture);
 	this.name = texture;
 	this.path = textureMap[texture];
 	this.shade = new ShaderBumpBox(texture, mag);   

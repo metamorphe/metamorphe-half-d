@@ -23,7 +23,9 @@ LambertBumpBox.prototype = {
 
 			self.texture = texture;
 			// UPDATE THE PHYSICAL/CPU ENGINE
-			self.depth_map = storage.cache(this.url, function(){ 
+			alert.notice("Calculating ... ");
+				
+			self.depth_map = storage.cache(self.url, function(){
 				return LambertBumpBox.cacheDepthMap(texture, self.obj)
 			}, function(val){
 				return $.map(val, function(val, i){
@@ -32,6 +34,7 @@ LambertBumpBox.prototype = {
 			});
 
 			callbackFN(self);
+			
 		});
 	}, 
 	raise: function(mag){
@@ -67,8 +70,7 @@ LambertBumpBox.adjustDepthMap = function(depthMap, magnitude){
 }
 
 LambertBumpBox.cacheDepthMap = function(texture, obj){
-	console.log("caching");
-	
+	console.log("caching");	
 	// vertexID ==> normal * grayImagePixel 
 		depthMap = [];
 

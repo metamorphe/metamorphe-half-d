@@ -5,7 +5,7 @@ function WebStorage(){
 WebStorage.prototype = {
 	init: function(){
 		if(typeof(Storage) !== "undefined")
-			this.store = sessionStorage;
+			this.store = localStorage;
 		else
 			console.log("Sorry, no web storage supported :(. ")
 	},

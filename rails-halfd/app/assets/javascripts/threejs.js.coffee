@@ -17,10 +17,10 @@
 //= require metamorphehalf/write_binary_stl
 //= require metamorphehalf/file_saver.min
 //= require metamorphehalf/image_preview.js
-# //= require metamorphehalf/stl_generator
 //= require metamorphehalf/BumpBox
 //= require metamorphehalf/LambertBumpBox
 //= require metamorphehalf/ShaderBumpBox
+//= require ui_alert
 
 
 

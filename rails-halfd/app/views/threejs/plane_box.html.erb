@@ -8,33 +8,53 @@ var pb;
 $(function(){
 	
 	env = new WebEnv($("#ThreeJS"));
+	
+
+
+
+	// for(var i = 0; i > 20, i++){
+	// 	box2  = boxB.clone();
+	// 	box2.position.y += i * 6;
+	// }
+
+	// pb = new PlaneBox(100, 100, 20, 10, 10, 1, new THREE.MeshLambertMaterial({
+    // color: new THREE.Color(0xffffff)
+ 
+	var gui = new dat.GUI();
+	var c = new Capacitor();
+	var plate_controller = gui.add(c, "num_of_plates", 5, 20);
+	gui.add(c, "create");
+
+	plate_controller.onChange(function(){
+		// c.update();
+	});
+});
+
 
 	
-    pb = new PlaneBox(100, 100, 20, 10, 10, 1, new THREE.MeshLambertMaterial({
-    	color: new THREE.Color(0xffffff)
-    }));
-   
-	env.scene.add(pb.mesh);
+function Capacitor(){
+	this.num_of_plates = 20;
+	var self = this;
+	this.create = function(){
+		self.update();
+	}
+}
+Capacitor.prototype = {
+	update: function(){
+		var boxGeom = new THREE.BoxGeometry(100, 10, 100);
+		var lamM = new THREE.MeshLambertMaterial({
+	    	color: new THREE.Color(0xffffff)
+	 	});
 
-	 for(var i in pb.geometry.vertices)
-    	if(i % 4 == 0)
-		    pb.geometry.vertices[i].z += 10;
-    pb.geometry.verticesNeedUpdate = true;
-	// pb.geometry.elementsNeedUpdate = true;
-	// pb.geometry.morphTargetsNeedUpdate = true;
-	// pb.geometry.uvsNeedUpdate = true;
-	// pb.geometry.normalsNeedUpdate = true;
-	// pb.geometry.colorsNeedUpdate = true;
-	// pb.geometry.tangentsNeedUpdate = true;
-	pb.geometry.computeFaceNormals();
-	pb.geometry.computeVertexNormals();
-	var gui = new dat.GUI();
-});
+		var boxMesh = new THREE.Mesh(boxGeom, lamM);
+		for(var i = 0; i < this.num_of_plates; i ++){
+			var b = boxMesh.clone();
+			b.position.y += 20 * i;
+			env.scene.add(b);
+		}
+	}
+}
 
-$(window).resize(function(){
-	console.log("Resized!");
-	THREEx.WindowResize(env.renderer, env.camera);
-});
 
 
 function addStats(container){

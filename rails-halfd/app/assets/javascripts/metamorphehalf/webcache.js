@@ -42,9 +42,9 @@ WebStorage.prototype = {
 		this.store.removeItem(k);
 	}, 
 	clear: function(k){
-		if(!check_valid) return;
+		if(!this.check_valid()) return;
 		console.log("Clearing sessionStorage.")
 		for(var i in this.store)
-			this.removeItem(i);
+			this.store.removeItem(i);
 	}
 }

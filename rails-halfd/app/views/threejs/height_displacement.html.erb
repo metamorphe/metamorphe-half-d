@@ -75,6 +75,9 @@ TactileController.prototype = {
 		// tc.switch();
 		var self = this;
 		this.current_model.save(this.texture);
+	}, 
+	clear: function(){
+		storage.clear();
 	}
 }
 
@@ -133,8 +136,10 @@ function configureGUI(tc){
 	var magnitudeController = gui.add(tc, 'magnitude', 0, 30);
 	magnitudeController.onChange(function(){ tc.mag(); });
 
+	var clear_cache = gui.add(tc, 'clear');
 	// export
 	var exporter = gui.add(tc, 'save');
+
 }
 
 </script>

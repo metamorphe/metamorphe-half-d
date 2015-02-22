@@ -69,7 +69,7 @@ LambertBumpBox.getDepthMap = function(texture, obj, fn, box){
 		var wp = new workPackage(texture, obj.mesh.geometry);
 		
 		depthWorker.addEventListener('message', function(e) {
-			console.log("Worker said:",  e.data);
+		
 		  	var depthMap = e.data.map(function(el, i){
 		  		return new THREE.Vector3(el.x, el.y, el.z);
 		  	});
@@ -78,10 +78,7 @@ LambertBumpBox.getDepthMap = function(texture, obj, fn, box){
 		  	fn(box);
 	  	}, false);
 
-		depthWorker.postMessage({'wp': wp});
-	
-	 	// console.log('Worker said: ', depthMap, depthMap.length);
-	  	
+		depthWorker.postMessage({'wp': wp}); 	
 	
 	}, function(val){
 

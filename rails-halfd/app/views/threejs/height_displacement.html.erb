@@ -141,6 +141,7 @@ function configureGUI(tc){
 	var texture = gui.add(tc, 'texture', textureNames);
 
 	texture.onChange(function(){
+		tc.clear();
 		tc.switch();
 		// model.map(model.filename);
 		// img_preview.swap(model.directory + model.filename);

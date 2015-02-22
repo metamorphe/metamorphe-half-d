@@ -8,22 +8,22 @@ var lambertMaterial = new THREE.MeshLambertMaterial({
 						      });
 
 
-function LambertBumpBox(url, mag){
+function LambertBumpBox(url, mag, h, w, d, resolution){
 	this.url = url; 
 	this.mag = mag;
-
+	this.h = h; 
+	this.w = w; 
+	this.d = d; 
+	this.resolution = resolution;
 
 }
-
-
-
 
 LambertBumpBox.prototype = {
 	load: function(callbackFN){
 		var self = this;
 		alert.notice("Calculating ... ");
 		BumpBox.loadTexture(this.url, function(texture){
-			self.obj = BumpBox.make(70, 70, 100.0, lambertMaterial);
+			self.obj = BumpBox.make(self.w, self.h, self.d, self.resolution, lambertMaterial);
 			self.obj.mesh.geometry.original = clone_vec_array(self.obj.mesh.geometry.vertices); //Keep the original geometry
 
 			self.texture = texture;
@@ -57,9 +57,11 @@ LambertBumpBox.prototype = {
 
 
 LambertBumpBox.adjustDepthMap = function(depthMap, magnitude){
-	var new_depth = []
-	for(var i in depthMap)
+	var new_depth = [];
+
+	for(var i in depthMap){
 		new_depth[i] = depthMap[i].clone().multiplyScalar(magnitude);
+	}
 	return new_depth;
 }
 

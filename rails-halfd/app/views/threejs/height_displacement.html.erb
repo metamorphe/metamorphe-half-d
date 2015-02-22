@@ -34,13 +34,13 @@ function initWorkers(){
 }
 
 function TactileController(){
-	this.texture = "corn";
-
+	this.texture = GET().texture || "corn";
+	this.engine = GET().engine || "shade";
 	this.current_model;
 	this.magnitude = 20.0;
 	this.loaded = {};
 	this.env = new WebEnv($("#ThreeJS"));
-	this.engine = "shade";
+	
 	this.preview = new ImagePreview(this.env.container, textureMap[this.texture]);
 
 }
@@ -58,21 +58,23 @@ TactileController.prototype = {
 
 		var model = this.loaded[this.texture];
 		if(typeof model === "undefined") model = new TactileModel(textureMap[this.texture], 
-			100, 100, 5, 100, self.magnitude);
-		this.current_model = model;
+			70, 70, 1, 100, self.magnitude);
 		model.load(this.engine, this.add, self);
 	},
 	add: function(tc, model){
 		console.log("Added " + model.name);
-		tc.env.scene.add(model[tc.engine].obj.mesh);
+		tc.clear();
+		tc.current_model = model;
+		tc.env.scene.add(tc.current_model[tc.engine].obj.mesh);
 		tc.preview.swap(textureMap[tc.texture]);
 		tc.mag();
 		alert.hide();
+		hist = generateURL();
+		history.pushState({}, hist.title, hist.href);
 	}, 
 	switch: function(){
 		console.log("Switching to", textureMap[this.texture]);
 		var self = this;
-		this.clear();
 		this.load();
 	},
 	mag: function(){
@@ -80,6 +82,7 @@ TactileController.prototype = {
 	},
 	clear: function(){
 		console.log("Cleared the stage.");
+		if(typeof this.current_model === "undefined") return; 
 		if(typeof this.current_model.bump.obj !== "undefined")
 			this.env.scene.remove(this.current_model.bump.obj.mesh);
 		if(typeof this.current_model.shade.obj !== "undefined")
@@ -101,8 +104,8 @@ TactileController.prototype = {
 function TactileModel(texture, h, w, d, resolution, mag){
 	this.name = texture;
 	this.path = textureMap[texture];
-	this.shade = new ShaderBumpBox(texture, mag);   
-	this.bump = new LambertBumpBox(texture, mag);
+	this.shade = new ShaderBumpBox(texture, mag, h, w, d, resolution);   
+	this.bump = new LambertBumpBox(texture, mag,  h, w, d, resolution);
 }
 
 TactileModel.prototype = {
@@ -141,7 +144,6 @@ function configureGUI(tc){
 	var texture = gui.add(tc, 'texture', textureNames);
 
 	texture.onChange(function(){
-		tc.clear();
 		tc.switch();
 		// model.map(model.filename);
 		// img_preview.swap(model.directory + model.filename);
@@ -159,6 +161,12 @@ function configureGUI(tc){
 
 }
 
+function generateURL(){
+	return {
+		title: tc.texture + " rendered as " + tc.engine,
+		href: "height_displacement?engine=" + tc.engine +"&" + "texture=" + tc.texture
+		}
+}
 </script>
 
 <style type="text/css">

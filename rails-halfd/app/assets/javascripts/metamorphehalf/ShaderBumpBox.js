@@ -1,14 +1,18 @@
 
-function ShaderBumpBox(url, mag){
+function ShaderBumpBox(url, mag,  h, w, d, resolution){
 	this.url = url; 
 	this.mag = mag;
+	this.h = h; 
+	this.w = w; 
+	this.d = d; 
+	this.resolution = resolution;
 }
 ShaderBumpBox.prototype = {
 	load: function(callbackFN){
 		var self = this;
 		BumpBox.loadTexture(this.url, function(texture){
 			var shaderMaterial = ShaderBumpBox.makeShaderTexture(texture, self.mag);
-			self.obj = BumpBox.make(70, 70, 100.0, shaderMaterial);
+			self.obj = BumpBox.make(self.w, self.h, self.d, self.resolution, shaderMaterial);
 			callbackFN(self);
 		});
 	}, 

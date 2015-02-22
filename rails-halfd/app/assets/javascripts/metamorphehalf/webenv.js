@@ -42,7 +42,7 @@ WebEnv.prototype = {
 		this.camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR);
 		// this.camera = new THREE.OrthographicCamera( - ASPECT * VIEW_SIZE / 2,  ASPECT * VIEW_SIZE / 2,  VIEW_SIZE / 2,  -VIEW_SIZE / 2, -1000, 1000);
 		this.scene.add(this.camera);
-		this.camera.position.set(0, 50, -340);
+		this.camera.position.set(0, 50, -100);
 		this.camera.lookAt(this.scene.position);	
 		
 		// RENDERER

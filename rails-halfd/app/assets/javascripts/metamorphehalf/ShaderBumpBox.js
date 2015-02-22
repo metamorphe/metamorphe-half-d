@@ -8,7 +8,7 @@ ShaderBumpBox.prototype = {
 		var self = this;
 		BumpBox.loadTexture(this.url, function(texture){
 			var shaderMaterial = ShaderBumpBox.makeShaderTexture(texture, self.mag);
-			self.obj = BumpBox.make(200, 200, 100.0, shaderMaterial);
+			self.obj = BumpBox.make(70, 70, 100.0, shaderMaterial);
 			callbackFN(self);
 		});
 	}, 

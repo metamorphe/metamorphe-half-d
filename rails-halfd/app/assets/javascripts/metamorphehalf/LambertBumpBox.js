@@ -23,7 +23,7 @@ LambertBumpBox.prototype = {
 		var self = this;
 		alert.notice("Calculating ... ");
 		BumpBox.loadTexture(this.url, function(texture){
-			self.obj = BumpBox.make(200, 200, 100.0, lambertMaterial);
+			self.obj = BumpBox.make(70, 70, 100.0, lambertMaterial);
 			self.obj.mesh.geometry.original = clone_vec_array(self.obj.mesh.geometry.vertices); //Keep the original geometry
 
 			self.texture = texture;

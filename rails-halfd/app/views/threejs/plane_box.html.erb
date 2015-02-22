@@ -8,53 +8,41 @@ var pb;
 $(function(){
 	
 	env = new WebEnv($("#ThreeJS"));
-	
 
-
-
-	// for(var i = 0; i > 20, i++){
-	// 	box2  = boxB.clone();
-	// 	box2.position.y += i * 6;
-	// }
-
-	// pb = new PlaneBox(100, 100, 20, 10, 10, 1, new THREE.MeshLambertMaterial({
-    // color: new THREE.Color(0xffffff)
- 
+	pb = new PlaneBox(100, 100, 20, 10, 10, 1, new THREE.MeshLambertMaterial({
+    color: new THREE.Color(0xffffff)}));
+ 	env.scene.add(pb.mesh);
 	var gui = new dat.GUI();
-	var c = new Capacitor();
-	var plate_controller = gui.add(c, "num_of_plates", 5, 20);
-	gui.add(c, "create");
+	workerTasks();
 
-	plate_controller.onChange(function(){
-		// c.update();
-	});
 });
 
+function workPackage(texture, geom){
+	var image = texture.image;
+	var height = image.height;
+	var width = image.width;
 
-	
-function Capacitor(){
-	this.num_of_plates = 20;
-	var self = this;
-	this.create = function(){
-		self.update();
-	}
-}
-Capacitor.prototype = {
-	update: function(){
-		var boxGeom = new THREE.BoxGeometry(100, 10, 100);
-		var lamM = new THREE.MeshLambertMaterial({
-	    	color: new THREE.Color(0xffffff)
-	 	});
-
-		var boxMesh = new THREE.Mesh(boxGeom, lamM);
-		for(var i = 0; i < this.num_of_plates; i ++){
-			var b = boxMesh.clone();
-			b.position.y += 20 * i;
-			env.scene.add(b);
-		}
-	}
+	if(! texture.rgb_calculated) texture.calculateRGB();
+	this.pixels = texture.imgCanvas.getImageData(0, 0, height, width);
+	this.faces = geom.faces;
+	this.faceVertexUvs = geom.faceVertexUvs;
 }
 
+function workerTasks(){
+	var worker = new Worker('/assets/metamorphehalf/ScanWorker.js');
+
+	worker.addEventListener('message', function(e) {
+	  var depthMap = e.data.map(function(el, i){
+	  	return new THREE.Vector3(el.x, el.y, el.z);
+	  });
+	  console.log('Worker said: ', depthMap, depthMap.length);
+	}, false);
+
+	BumpBox.loadTexture("/heightmap/images/corn.jpg", function(texture){
+		var wp = new workPackage(texture, pb.mesh.geometry);
+		worker.postMessage({'wp': wp});
+	});
+}
 
 
 function addStats(container){
@@ -77,3 +65,4 @@ function addStats(container){
 <div class="threejs_container">
 <div id="ThreeJS" ></div>
 </div>
+<canvas id="texture-render" ></canvas>

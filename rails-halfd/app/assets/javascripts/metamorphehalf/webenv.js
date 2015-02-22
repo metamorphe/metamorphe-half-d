@@ -62,7 +62,7 @@ WebEnv.prototype = {
 		// FULLSCREEN
 		$(window).resize(function(){
 			console.log("Resized!");
-			THREEx.WindowResize(this.renderer, this.camera);
+			// THREEx.WindowResize(this.renderer, this.camera);
 		});
 		return container;
 	},

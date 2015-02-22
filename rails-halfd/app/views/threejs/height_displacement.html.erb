@@ -7,8 +7,10 @@
 	}
 </style>
 <script type="text/javascript">
-var tc, storage, alert;
+var tc, storage, alert, depthWorker;
+
 $(function(){
+	initWorkers();
 	storage = new WebStorage();
 	tc = new TactileController();
 	configureGUI(tc);
@@ -16,6 +18,20 @@ $(function(){
 	alert = new UIAlert(tc.env.container);
 });
 
+function workPackage(texture, geom){
+	var image = texture.image;
+	var height = image.height;
+	var width = image.width;
+
+	if(! texture.rgb_calculated) texture.calculateRGB();
+	this.pixels = texture.imgCanvas.getImageData(0, 0, height, width);
+	this.faces = geom.faces;
+	this.faceVertexUvs = geom.faceVertexUvs;
+}
+
+function initWorkers(){
+	depthWorker = new Worker('/assets/metamorphehalf/ScanWorker.js');
+}
 
 function TactileController(){
 	this.texture = "corn";
@@ -76,7 +92,7 @@ TactileController.prototype = {
 		var self = this;
 		this.current_model.save(this.texture);
 	}, 
-	clear: function(){
+	clear_cache: function(){
 		storage.clear();
 	}
 }
@@ -136,7 +152,7 @@ function configureGUI(tc){
 	var magnitudeController = gui.add(tc, 'magnitude', 0, 30);
 	magnitudeController.onChange(function(){ tc.mag(); });
 
-	var clear_cache = gui.add(tc, 'clear');
+	var clear_cache = gui.add(tc, 'clear_cache');
 	// export
 	var exporter = gui.add(tc, 'save');
 

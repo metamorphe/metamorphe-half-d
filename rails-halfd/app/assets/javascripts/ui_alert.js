@@ -1,7 +1,7 @@
 function UIAlert (container) {
-	console.log(container);
+	// console.log(container);
 	this.dom = UIAlert.generateDOM();
-	console.log(this.dom)
+	// console.log(this.dom)
 	$(container).append(this.dom);
 }
 

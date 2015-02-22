@@ -3,6 +3,7 @@
 THREE.Texture.prototype.calculateRGB = function() {
 	var img = this.image;
 	var canvas = $('canvas#texture-render')[0];
+	console.log("canvas", canvas)
 	canvas.width = img.width;
 	canvas.height = img.height;
 	canvas.getContext('2d').drawImage(img, 0, 0, img.width, img.height);

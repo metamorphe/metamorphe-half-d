@@ -14,27 +14,21 @@ function LambertBumpBox(url, mag){
 
 
 }
+
+
+
+
 LambertBumpBox.prototype = {
 	load: function(callbackFN){
 		var self = this;
+		alert.notice("Calculating ... ");
 		BumpBox.loadTexture(this.url, function(texture){
 			self.obj = BumpBox.make(200, 200, 100.0, lambertMaterial);
 			self.obj.mesh.geometry.original = clone_vec_array(self.obj.mesh.geometry.vertices); //Keep the original geometry
 
 			self.texture = texture;
 			// UPDATE THE PHYSICAL/CPU ENGINE
-			alert.notice("Calculating ... ");
-				
-			self.depth_map = storage.cache(self.url, function(){
-				return LambertBumpBox.cacheDepthMap(texture, self.obj)
-			}, function(val){
-				return $.map(val, function(val, i){
-					return new THREE.Vector3(val.x, val.y, val.z);
-				});
-			});
-
-			callbackFN(self);
-			
+			LambertBumpBox.getDepthMap(texture, self.obj, callbackFN, self);
 		});
 	}, 
 	raise: function(mag){
@@ -69,35 +63,31 @@ LambertBumpBox.adjustDepthMap = function(depthMap, magnitude){
 	return new_depth;
 }
 
-LambertBumpBox.cacheDepthMap = function(texture, obj){
-	console.log("caching");	
-	// vertexID ==> normal * grayImagePixel 
-		depthMap = [];
+LambertBumpBox.getDepthMap = function(texture, obj, fn, box){
 
-		var geometry = obj.mesh.geometry;
-		var vertices = clone_vec_array(obj.mesh.geometry.original);
-	    var faces = geometry.faces;
-	      
+	self.depth_map = storage.cache(box.url, function(){
+		var wp = new workPackage(texture, obj.mesh.geometry);
+		
+		depthWorker.addEventListener('message', function(e) {
+			console.log("Worker said:",  e.data);
+		  	var depthMap = e.data.map(function(el, i){
+		  		return new THREE.Vector3(el.x, el.y, el.z);
+		  	});
+		  	box.depth_map = depthMap;
+		  	storage.set(box.url, JSON.stringify(depthMap));
+		  	fn(box);
+	  	}, false);
 
-	    for (i = 0; i < geometry.faces.length ; i++) {
+		depthWorker.postMessage({'wp': wp});
+	
+	 	// console.log('Worker said: ', depthMap, depthMap.length);
+	  	
+	
+	}, function(val){
 
-	      var uv1 = geometry.faceVertexUvs[0][i][0];
-	      var v1 = vertices[faces[i].a];
-
-	      
-	      var uv2 = geometry.faceVertexUvs[0][i][1];
-	      var v2 = vertices[faces[i].b];	
-	      
-	      var uv3 = geometry.faceVertexUvs[0][i][2];
-	      var v3 = vertices[faces[i].c];
-
-	      var normal = faces[i].normal;
-	    
-	      depthMap[faces[i].a] = normal.clone().multiplyScalar(texture.getUV(uv1));
-	      depthMap[faces[i].b] = normal.clone().multiplyScalar(texture.getUV(uv2));
-	      depthMap[faces[i].c] = normal.clone().multiplyScalar(texture.getUV(uv3));
- 
-    	}
-   
-    	return depthMap; 
+		box.depth_map = $.map(val, function(val, i){
+			return new THREE.Vector3(val.x, val.y, val.z);
+		});
+		fn(box);
+	});
 }

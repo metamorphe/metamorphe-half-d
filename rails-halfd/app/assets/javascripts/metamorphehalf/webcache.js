@@ -15,13 +15,14 @@ WebStorage.prototype = {
 	cache: function(k, store_routine, parse_routine){
 		if(storage.includes(k)){
 			console.log("In storage: ", k);
-			return parse_routine(JSON.parse(storage.get(k)));
+			parse_routine(JSON.parse(storage.get(k)));
 		}
 		else{
 			console.log("Not in storage: ", k);
-			var v = store_routine();
-			storage.set(k, JSON.stringify(v));
-			return v;
+			// var v = 
+			store_routine();
+			// storage.set(k, JSON.stringify(v));
+			// return v;
 		}
 	}, 	
 	includes: function(k){

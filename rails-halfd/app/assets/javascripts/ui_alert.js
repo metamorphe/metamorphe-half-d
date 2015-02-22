@@ -12,7 +12,7 @@ UIAlert.generateDOM = function(){
 			  </div>');
 	dom.hide().css({
 		position: "absolute",
-		top: 10, 
+		bottom: 10, 
 		margin: "auto 20%", 
 		width: "60%",
 		"z-index": 100

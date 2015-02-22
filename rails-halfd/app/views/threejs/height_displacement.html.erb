@@ -13,9 +13,10 @@ $(function(){
 	initWorkers();
 	storage = new WebStorage();
 	tc = new TactileController();
+	alert = new UIAlert(tc.env.container);
 	configureGUI(tc);
 	tc.init();
-	alert = new UIAlert(tc.env.container);
+	
 });
 
 function workPackage(texture, geom){
@@ -58,7 +59,7 @@ TactileController.prototype = {
 
 		var model = this.loaded[this.texture];
 		if(typeof model === "undefined") model = new TactileModel(textureMap[this.texture], 
-			70, 70, 1, 100, self.magnitude);
+			70, 70, 1, 300, self.magnitude);
 		model.load(this.engine, this.add, self);
 	},
 	add: function(tc, model){

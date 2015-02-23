@@ -46,7 +46,11 @@ ShaderBumpBox.makeShaderTexture = function(texture, magnitude){
 			fragmentShader: phongShader.fragmentShader, //document.getElementById( 'fragmentShader' ).textContent,
 		  	lights: true,
     		fog: true,
-			side: THREE.DoubleSide
+			side: THREE.DoubleSide,
+			ambient: new THREE.Color( 0xff0000 ),
+	        color: new THREE.Color( 0xffffff ),
+	        specular: new THREE.Color( 0x00ff00 ),
+	        shininess: 0
 		});
 }
 

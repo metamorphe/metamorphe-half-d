@@ -39,7 +39,7 @@ LambertBumpBox.prototype = {
 		var vertices = clone_vec_array(this.obj.mesh.geometry.original);
 		var depth_map = LambertBumpBox.adjustDepthMap(this.depth_map, mag);
 	    
-	    this.obj.applyToTop(function(vertex, id){
+	    this.obj.applyTexture(function(vertex, id, normal){
 	    	vertex.add(depth_map[id]);
 	    }, vertices);
 

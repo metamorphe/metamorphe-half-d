@@ -14,9 +14,7 @@ BumpBox.make = function(h, w, d, resolution, material){
 	var h_segments = parseInt(h/seg_size);
 
 	pb = new PlaneBox(h, w, d, h_segments, w_segments, 1, material);
-	pb.mesh.rotation.x = - Math.PI / 2;
-	pb.mesh.rotation.z = - Math.PI;
-	pb.mesh.position.y =  0;
+	// pb = new TextureCylinder(35, 70, 100, 100, false, material);
 	return pb;	
 }
 
@@ -24,7 +22,7 @@ BumpBox.make = function(h, w, d, resolution, material){
 
 
 BumpBox.loadTexture = function(url, ready){
-	console.log("Trying to load", url, ready);
+	console.log("Trying to load", url);
 	var bumpTexture = new THREE.ImageUtils.loadTexture(url, THREE.UVMapping, function(texture){
 		console.log("Successfully loaded texture!", url);
 		ready(texture);

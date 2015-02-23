@@ -8,6 +8,9 @@ class ThreejsController < ApplicationController
   	render :layout => "full_screen"
   end
   def plane_box
+    render :layout => "full_screen"
+  end
+  def texture_cylinder
   	render :layout => "full_screen"
   end
 

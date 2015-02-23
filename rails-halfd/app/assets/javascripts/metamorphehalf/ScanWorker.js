@@ -14,32 +14,35 @@ function extractDepthMap(wp){
 	var width = wp.pixels.width;
 	var pixels = wp.pixels;
 	var faces = wp.faces;
-	var faceVertexUvs = wp.faceVertexUvs;
+	var faceVertexUvs = wp.faceVertexUvs[0];
 
 	var start = new Date().getTime();
 
 	depthMap = [];
 
 	faces.forEach(function(face, i){
-      var uv1 = faceVertexUvs[0][i][0];
+      var uv1 = faceVertexUvs[i][0];
       var pixel1 = getPixel(pixels, uv1, width, height);
 	  
-      var uv2 = faceVertexUvs[0][i][1];
+      var uv2 = faceVertexUvs[i][1];
       var pixel2 = getPixel(pixels, uv2, width, height);	
       
-      var uv3 = faceVertexUvs[0][i][2];
+      var uv3 = faceVertexUvs[i][2];
       var pixel3 = getPixel(pixels, uv3, width, height);
 
-      var normal = face.normal;
+      var normal = face.vertexNormals[0];
+      // console.log(face.vertexNormals)
 
       var a = { x: normal.x * pixel1, 
 		      	y: normal.y * pixel1, 
 		      	z: normal.z * pixel1
 		      };
+	  normal = face.vertexNormals[1];
       var b = { x: normal.x * pixel2, 
 	      	y: normal.y * pixel2, 
 	      	z: normal.z * pixel2
 	      };
+      normal = face.vertexNormals[2]; 
       var c = { x: normal.x * pixel3, 
 	      	y: normal.y * pixel3, 
 	      	z: normal.z * pixel3
@@ -91,5 +94,5 @@ function getPixel(pixels, uv, w, h){
 			}
 	
 
-	return .2126 * pixel.red + .7152 *  pixel.green + .0722 *  pixel.blue; 
+	return (.2126 * pixel.red + .7152 *  pixel.green + .0722 *  pixel.blue); 
 }

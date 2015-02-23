@@ -8,6 +8,9 @@ function PlaneBox(h, w, d, h_s, w_s, d_s, material){
 
 
 	this.mesh = new THREE.Mesh(	geometry, material );
+	this.mesh.rotation.x = - Math.PI / 2;
+	this.mesh.rotation.z = - Math.PI;
+	this.mesh.position.y =  0;
 	this.material = material;
 	// this.mesh.rotation.x = -Math.PI / 2;
 	// this.mesh.position.y = -100;
@@ -15,31 +18,79 @@ function PlaneBox(h, w, d, h_s, w_s, d_s, material){
 
 PlaneBox.prototype = {
 	// Return the top geometry of the planar box
-	cacheTop: function(){
-		if(typeof this.top_indices !== "undefined") return this.top_indices;
+	computeTextelIndices: function(){
+		// if(typeof this.top_indices !== "undefined") return this.top_indices;
+
+		// var geom = this.mesh.geometry;
+		// this.top_indices = [];
+		// var self = this;
+		
+		// // vertice indices
+		// $.map(geom.vertices, function(el, i){
+		// 	if(el.z >= self.depth/2.0) self.top_indices.push(i);
+		// });
+
+
+
+		// return this.top_indices;
+
+
+		if(typeof this.textel_indices !== "undefined") return this.textel_indices;
 
 		var geom = this.mesh.geometry;
-		this.top_indices = [];
+		this.textel_indices = [];
 		var self = this;
 		
 		// vertice indices
-		$.map(geom.vertices, function(el, i){
-			if(el.z >= self.depth/2.0) self.top_indices.push(i);
+		var keys = ["a", "b", "c"];
+		var indices = [];
+		var normals = [];
+		$.map(geom.faces, function(el, i){
+			for(var j in keys){
+				var vert = el[keys[j]];
+				var vertexNorm = el.vertexNormals[j];
+				// if(el.z >= self.depth/2.0) 
+				// console.log(vertexNorm);
+				if(vertexNorm.z > 0.9){
+					indices.push(vert);
+					normals.push(vertexNorm);
+				}
+			}
 		});
 
+		// ONLY UNIQUE VERTICES
+		var clean_indices = [];
+		var clean_normals = [];
+		$.each(indices, function(i, el){
+			if($.inArray(el, clean_indices) === -1){
+				clean_indices.push(el);
+				clean_normals.push(normals[i]);
+			}
+		});
 
+		this.textel_indices = $.map(clean_indices, function(el, i){
+			return {vertex: el, normal: clean_normals[i]}
+		});
 
-		return this.top_indices;
+		return this.textel_indices;
 	}, 
 	// applies fn to top vertex indices
-	applyToTop: function(fn, vertices){
-		var top = this.cacheTop();
-		$.each(top, function(i, el){
-			var vertex = vertices[el]
-			fn(vertex, el);
+	applyTexture: function(fn, vertices){
+		// var top = this.computeTextelIndices();
+		// $.each(top, function(i, el){
+		// 	var vertex = vertices[el]
+		// 	fn(vertex, el);
+		// });
+		// this.mesh.geometry.verticesNeedUpdate = true;
+		// return true;
+		this.mesh.geometry.computeVertexNormals();
+		var textel_indices = this.computeTextelIndices();
+		
+		$.each(textel_indices, function(i, el){
+			fn(vertices[el.vertex], el.vertex, el.normal);
 		});
+
 		this.mesh.geometry.verticesNeedUpdate = true;
-		return true;
 	}
 
 

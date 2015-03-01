@@ -18,7 +18,7 @@ ShaderBumpBox.prototype = {
 	}, 
 	raise: function(mag){
 		this.mag = mag;
-		// this.obj.material.uniforms.bumpScale.value = this.mag;
+		this.obj.mesh.material.bumpScale = this.mag;
 	}
 }
 
@@ -27,35 +27,18 @@ ShaderBumpBox.makeShaderTexture = function(texture, magnitude){
 	var bumpTexture = texture;
 	bumpTexture.wrapS = bumpTexture.wrapT = THREE.RepeatWrapping; 
 	// bumpTexture.wrapS = bumpTexture.wrapT = THREE.ClampToEdgeWrapping; 
-	// bumpTexture.minFilter = THREE.LinearFilter;
+	bumpTexture.minFilter = THREE.LinearFilter;
 
 	var bumpScale   = magnitude;		
-	var customUniforms = {
-		bumpTexture:	{ type: "t", value: bumpTexture },
-		bumpScale:	    { type: "f", value: bumpScale },
-	};
+	var phongShader = THREE.ShaderLib.lambert;
 
-	var phongShader = THREE.ShaderLib.phong;
-	var uniforms = THREE.UniformsUtils.clone(phongShader.uniforms);
-	uniforms.bumpTexture = { type: "t", value: bumpTexture };
-	uniforms.bumpScale = { type: "f", value: bumpScale };
-	console.log("Generating..");
-	return new THREE.MeshLambertMaterial({
+	return new THREE.MeshPhongMaterial({
+		 	ambient: new THREE.Color( 0xff0000 ),
 			map: bumpTexture,
 			bumpMap: bumpTexture,
-			bumpScale: magnitude,
-			ambient: new THREE.Color( 0xff0000 ),
-	        color: new THREE.Color( 0xffffff ),
-	        specular: new THREE.Color( 0x00ff00 ),
-	        // emissive: new THREE.Color( 0x0000ff ),
-	        side: THREE.DoubleSide,
-	        shininess: 0,
-		    uniforms: uniforms,
-			// vertexShader:  phongShader.vertexShader, //document.getElementById( 'vertexShader' ).textContent,
-			// fragmentShader: phongShader.fragmentShader, //document.getElementById( 'fragmentShader' ).textContent,
+			bumpScale: 3,
 		  	lights: true,
     		fog: true,
-			side: THREE.DoubleSide
 		});
 }
 

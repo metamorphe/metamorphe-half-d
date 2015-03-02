@@ -44,7 +44,7 @@ gem 'carrierwave'
 gem 'bootstrap-sass', 
   git: 'https://github.com/twbs/bootstrap-sass', 
   ref: '540ad23430b1bdb2c72591daf61507ec9e38e468'
-gem 'rmagick', '~> 2.13.2', require: false
-gem 'threejs-rails'
+#gem 'rmagick', '~> 2.13.2', require: false
+gem 'threejs-rails', git: 'git://github.com/marvindanig/threejs-rails.git'
 gem 'markdown-rails'
 gem 'd3-rails'

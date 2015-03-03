@@ -4,6 +4,11 @@ class ThreejsController < ApplicationController
   	render :layout => "full_screen"
   	# render :json => @files
   end
+  def structure
+  @files = Dir.glob("public/heightmap/structure/*").collect!{|c| "/" + c.split('/')[1..-1].join('/')}.to_json.html_safe
+    render :layout => "full_screen"
+    # render :json => @files
+  end
   def environment
   	render :layout => "full_screen"
   end

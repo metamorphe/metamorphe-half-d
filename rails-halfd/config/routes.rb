@@ -1,5 +1,7 @@
+
 Rails.application.routes.draw do
 
+  get 'threejs/structure', :as => "pic2structure"
   get 'threejs/height_displacement', :as => "pic2stl"
   get 'threejs/environment', :as => "three_env"
   get 'threejs/plane_box', :as => "plane_box"

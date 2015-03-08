@@ -6,7 +6,7 @@ function ImagePreview(container, url){
 		position: "relative", 
 		width: 100,
 		border: "1px solid #00A8E1", 
-		top: - $(container).height() + 72, 
+		top: - $(container).height() + 100, 
 		left: 0, 
 		"margin-top": -100,
 		"z-index": 100

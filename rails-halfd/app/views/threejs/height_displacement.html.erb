@@ -39,10 +39,12 @@ function TactileController(){
 	this.texture = GET().texture || "corn";
 	this.engine = GET().engine || "shade";
 	this.current_model;
-	this.magnitude = 20.0;
+	this.magnitude = 5.0;
 	this.loaded = {};
 	this.env = new WebEnv($("#ThreeJS"));
 	this.preview;
+	this.base_height = 2;
+
 }
 
 TactileController.textures =  <%= @files %>;
@@ -59,7 +61,13 @@ TactileController.prototype = {
 
 		var model = this.loaded[this.texture];
 		if(typeof model === "undefined") model = new TactileModel(textureMap[this.texture], 
-			70, 70, 2, 150, self.magnitude);
+			70, 70, this.base_height, 150, self.magnitude);
+		model.load(this.engine, this.add, self);
+	},
+	bh_adj: function(){
+		var self = this;
+		var model = new TactileModel(textureMap[this.texture], 
+			70, 70, this.base_height, 150, self.magnitude);
 		model.load(this.engine, this.add, self);
 	},
 	add: function(tc, model){
@@ -163,9 +171,13 @@ function configureGUI(tc){
 	var engineController = gui.add(tc, 'engine', ["shade", "bump"]);
 	engineController.onChange(function(){ tc.switch(); });
 
-	var magnitudeController = gui.add(tc, 'magnitude', 0, 30);
+	var magnitudeController = gui.add(tc, 'magnitude', 0, 10);
+	var bhController = gui.add(tc, 'base_height', 0.01, 10);
 	magnitudeController.onChange(function(){ tc.mag(); });
 
+	bhController.onFinishChange(function(){
+		tc.bh_adj();
+	});
 	var clear_cache = gui.add(tc, 'clear_cache');
 	var clear_cache = gui.add(tc, 'clear_self');
 	// export

@@ -250,6 +250,7 @@ THREE.ShaderLib = {
 
 			"#define PHONG",
 
+			
 			"varying vec3 vViewPosition;",
 			"varying vec3 vNormal;",
 
@@ -342,7 +343,6 @@ THREE.ShaderLib = {
 
 			"void main() {",
 			
-
 			"	gl_FragColor = vec4( vec3( 1.0 ), opacity );",
 
 				THREE.ShaderChunk[ "logdepthbuf_fragment" ],

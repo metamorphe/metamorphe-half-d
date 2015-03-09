@@ -7,12 +7,18 @@
 	}
 </style>
 <script type="text/javascript">
-var tc, storage, alert, depthWorker;
+var tc, storage, alert, depthWorker, textureNames, textureMap;
+
 
 $(function(){
 	initWorkers();
 	storage = new WebStorage();
 	tc = new TactileController();
+	textureNames = $.map(TactileController.textures, function(el, i){
+			var path_tokens = el.split('/');
+			return path_tokens[path_tokens.length - 1].split(".")[0];
+		});
+	textureMap = {};
 	alert = new UIAlert(tc.env.container);
 	configureGUI(tc);
 	tc.init();
@@ -36,9 +42,7 @@ function TactileController(){
 	this.magnitude = 20.0;
 	this.loaded = {};
 	this.env = new WebEnv($("#ThreeJS"));
-	
-	
-
+	this.preview;
 }
 
 TactileController.textures =  <%= @files %>;
@@ -78,12 +82,13 @@ TactileController.prototype = {
 		this.current_model.mag(this.engine, this.magnitude);
 	},
 	clear: function(){
-		console.log("Cleared the stage.");
+		console.log("Clearing the stage.");
 		if(typeof this.current_model === "undefined") return; 
 		if(typeof this.current_model.bump.obj !== "undefined")
 			this.env.scene.remove(this.current_model.bump.obj.mesh);
 		if(typeof this.current_model.shade.obj !== "undefined")
 			this.env.scene.remove(this.current_model.shade.obj.mesh);
+		console.log("Cleared the stage.");
 	}, 
 	save: function(){
 		// TODO: trigger change with controller
@@ -123,11 +128,6 @@ TactileModel.prototype = {
 		this.bump.save(name);
 	}
 }
-var textureNames = $.map(TactileController.textures, function(el, i){
-			var path_tokens = el.split('/');
-			return path_tokens[path_tokens.length - 1].split(".")[0];
-		});
-var textureMap = {};
 
 function configureGUI(tc){
 	$.each(TactileController.textures, function(i, el){

@@ -67,16 +67,6 @@ function getPixel(pixels, uv, w, h){
 	if(u < 0.01) u = 0.01; // image overhang adjustment
 	if(v < 0.01) v = 0.01; // image overhang adjustment
 
-	// var x = u * 1.0 * w;
-	// var y = v * 1.0 * h; 
-
-	// //todo billerp here
-	// x = Math.floor(x);
-	// y = Math.floor(y);
-	// // flip vertex
-	// x = w - x;
-	// y = h - y;
-
 	var x = w - Math.floor(u * 1.0 * w);
 	var y = h - Math.floor(v * 1.0 * h);
 
@@ -84,6 +74,7 @@ function getPixel(pixels, uv, w, h){
 	var row = x * (w * 4); 
 	var col = y * 4;
 	var index = row + col;
+
 	
 	return pixels.data[index];
 }

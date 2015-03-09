@@ -11,22 +11,12 @@ Please feel free to use a different markup language if you do not plan to run
 === IMG2STL
 
 * _Functionality_ MODIFY SHADER TO DISCARD NONRELEVANT VERTICES
-* Realworld dimensions to output models (1000 ==> 1000mm)
 * _Optimization_ BILINEAR INTERPOLATION OF POINTS
 * _Optimization_ IMAGE CONVERSION TO A POWER OF TWO
 * _Usability_ Reconfigure lights
 
 * NEIL: _Usability_ SWAP OUT TEXTURE FROM LIBRARY
 * NEIL _Functionality_ UPLOAD/SWITCH NEW TEXTURE
-* _Usability_ ADD A PROCESSING MESSAGE WHEN CONVERTING ENGINE
-
-* DONE: _Functionality_ ROTATE AND TRIM TEXTURE
-* DONE: _Usability_ LOAD FROM SESSION STORAGE
-* DONE: _Functionality_ TIME RENDER CYCLE
-* DONE: _Usability_ TURN TO FULL SCREEN ENVIRONMENT
-* DONE: _Functionality_ EXPORT AS AN STL
-* DONE: _Functionality_ CREATE BOXPLANE OBJECT
-* DONE: _Functionality_ REFACTOR CODE TO ASK FOR RELEVANT VERTICES
 
 
 === REAL WORLD CLASSIFIER

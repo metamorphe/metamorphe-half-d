@@ -32,6 +32,11 @@ LambertBumpBox.prototype = {
 			LambertBumpBox.getDepthMap(texture, self.obj, callbackFN, self);
 		});
 	}, 
+	dimensions: function(){
+		this.obj.mesh.geometry.computeBoundingBox();
+		var bb = this.obj.mesh.geometry.boundingBox;
+		return bb.max.clone().sub(bb.min);
+	},
 	raise: function(mag){
 		mag /= 250.0;
 		

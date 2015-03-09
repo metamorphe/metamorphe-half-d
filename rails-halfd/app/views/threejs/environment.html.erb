@@ -1,10 +1,10 @@
+<%= javascript_include_tag 'metamorphehalf/DimensionsPreview', 'data-turbolinks-track' => true %>
 <script type="text/javascript">
 var env;
+var dim;
 var lambertMaterial = new THREE.MeshPhongMaterial({
-						        // light
-						        // specular: '#a9fcff',
-						        // intermediate
-						        // color: '#00abb1',
+						        specular: '#a9fcff',
+						        color: '#00abb1',
 						        ambient: new THREE.Color( 0xffffff ),
 						        // dark
 						        specular: new THREE.Color( 0x111111 ),
@@ -16,8 +16,6 @@ var lambertMaterial = new THREE.MeshPhongMaterial({
 $(function(){
 	
 	env = new WebEnv($("#ThreeJS"));
-		
-	// STLGenerator.textureMaterial
 	var planeGeo = new THREE.PlaneGeometry( 1000, 1000, 10, 10) ;
 	var plane = new THREE.Mesh(	planeGeo, lambertMaterial);
 	plane.rotation.x = -Math.PI / 2;
@@ -26,6 +24,7 @@ $(function(){
 
 
 	var gui = new dat.GUI();
+	dim = new DimensionsPreview(env.container);
 });
 
 $(window).resize(function(){

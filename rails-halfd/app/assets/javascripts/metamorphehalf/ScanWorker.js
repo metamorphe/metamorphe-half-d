@@ -80,16 +80,10 @@ function getPixel(pixels, uv, w, h){
 	var x = w - Math.floor(u * 1.0 * w);
 	var y = h - Math.floor(v * 1.0 * h);
 
-	var pixel = {};
+	// var pixel = {};
 	var row = x * (w * 4); 
 	var col = y * 4;
 	var index = row + col;
-
-	pixel = { red: pixels.data[index],
-			  green: pixels.data[index + 1],
-			  blue: pixels.data[index + 2]
-			}
 	
-
-	return .2126 * pixel.red + .7152 *  pixel.green + .0722 *  pixel.blue; 
+	return pixels.data[index];
 }

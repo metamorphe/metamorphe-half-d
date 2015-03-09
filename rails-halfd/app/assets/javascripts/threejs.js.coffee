@@ -20,6 +20,7 @@
 //= require metamorphehalf/BumpBox
 //= require metamorphehalf/LambertBumpBox
 //= require metamorphehalf/ShaderBumpBox
+//= require metamorphehalf/Filters
 //= require ui_alert
 
 

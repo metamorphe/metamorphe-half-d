@@ -20,12 +20,7 @@ $(function(){
 });
 
 function workPackage(texture, geom){
-	var image = texture.image;
-	var height = image.height;
-	var width = image.width;
-
-	if(! texture.rgb_calculated) texture.calculateRGB();
-	this.pixels = texture.imgCanvas.getImageData(0, 0, height, width);
+	this.pixels = Filters.filterImage(Filters.grayscale, texture.image);
 	this.faces = geom.faces;
 	this.faceVertexUvs = geom.faceVertexUvs;
 }
@@ -42,7 +37,7 @@ function TactileController(){
 	this.loaded = {};
 	this.env = new WebEnv($("#ThreeJS"));
 	
-	this.preview = new ImagePreview(this.env.container, textureMap[this.texture]);
+	
 
 }
 
@@ -52,6 +47,7 @@ TactileController.prototype = {
 	init: function(){
 		var self = this;
 		this.load();
+		this.preview = new ImagePreview(this.env.container, textureMap[this.texture]);
 	},
 	load:function(){
 		console.log("Loading", this.texture, "on", this.engine);

@@ -109,6 +109,10 @@ TactileController.prototype = {
 	clear_cache: function(){
 		storage.clear();
 		alert.flash("Cleared cache", 1000);
+	}, 
+	clear_self: function(){
+		storage.remove(this.current_model.name);
+		alert.flash("Cleared self from cache", 1000);
 	}
 }
 
@@ -163,6 +167,7 @@ function configureGUI(tc){
 	magnitudeController.onChange(function(){ tc.mag(); });
 
 	var clear_cache = gui.add(tc, 'clear_cache');
+	var clear_cache = gui.add(tc, 'clear_self');
 	// export
 	var exporter = gui.add(tc, 'save');
 

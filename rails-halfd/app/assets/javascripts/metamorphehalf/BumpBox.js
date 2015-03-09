@@ -15,7 +15,8 @@ BumpBox.make = function(h, w, d, resolution, material){
 
 	pb = new PlaneBox(h, w, d, h_segments, w_segments, 1, material);
 	pb.mesh.rotation.x = - Math.PI / 2;
-	pb.mesh.rotation.z = - Math.PI;
+	// pb.mesh.rotation.z = - Math.PI;
+	// pb.mesh.rotation.z = - Math.PI;
 	pb.mesh.position.y =  0;
 	return pb;	
 }

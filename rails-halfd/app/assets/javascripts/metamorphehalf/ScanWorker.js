@@ -1,5 +1,18 @@
 	// importScripts('/assets/three.js');
+	
+	// depthWorker.addEventListener('message', function(e) {
+	//   	var depthMap = e.data.map(function(el, i){
+	//   		return new THREE.Vector3(el.x, el.y, el.z);
+	//   	});
 
+	//   	box.depth_map = depthMap;
+	//   	storage.set(box.url, JSON.stringify(depthMap));
+	//  	  	fn(box);
+
+	//  	}, false);
+
+
+	// depthWorker.postMessage({'wp': wp}); 
 
 	self.addEventListener('message', function(e) {
 	var data = e.data;
@@ -18,7 +31,7 @@
 		var faces = wp.faces;
 		var faceVertexUvs = wp.faceVertexUvs;
 
-		var start = new Date().getTime();
+		
 
 		depthMap = [];
 
@@ -46,15 +59,10 @@
 				y: normal.y * pixel3, 
 				z: normal.z * pixel3
 			};
-
 			depthMap[faces[i].a] = a; 
 			depthMap[faces[i].b] = b; 
 			depthMap[faces[i].c] = c; 
 		});
-
-		var end = new Date().getTime();
-		var time = end - start;
-		console.log('Execution time: ' + time, depthMap.length);
 		return depthMap;
 	}
 

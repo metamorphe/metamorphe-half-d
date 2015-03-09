@@ -65,29 +65,77 @@ LambertBumpBox.adjustDepthMap = function(depthMap, magnitude){
 	}
 	return new_depth;
 }
+var wp;
 
 LambertBumpBox.getDepthMap = function(texture, obj, fn, box){
-
-	self.depth_map = storage.cache(box.url, function(){
-		var wp = new workPackage(texture, obj.mesh.geometry);
-		
-		depthWorker.addEventListener('message', function(e) {
-		
-		  	var depthMap = e.data.map(function(el, i){
-		  		return new THREE.Vector3(el.x, el.y, el.z);
-		  	});
-		  	box.depth_map = depthMap;
-		  	storage.set(box.url, JSON.stringify(depthMap));
-		  	fn(box);
-	  	}, false);
-
-		depthWorker.postMessage({'wp': wp}); 	
+	var start = performance.now();
 	
-	}, function(val){
+	self.depth_map = storage.cache(box.url, function(){
+		wp = new workPackage(texture, obj.mesh.geometry);
+		box.depth_map = extractDepthMap(wp);
+		var end = performance.now();
+		var time = (end - start)/1000;
+		console.log('Total Execution time: ' + time.toFixed(2));
 
+		fn(box);
+	}, function(val){
 		box.depth_map = $.map(val, function(val, i){
 			return new THREE.Vector3(val.x, val.y, val.z);
 		});
+		var end = performance.now();
+		var time = (end - start)/1000;
+		console.log('Total Execution time: ' + time.toFixed(2));
 		fn(box);
 	});
 }
+
+
+function extractDepthMap(wp){
+	console.log("Extracting");
+	var height = wp.pixels.height;
+	var width = wp.pixels.width;
+	var pixels = wp.pixels;
+	var faces = wp.faces;
+	var faceVertexUvs = wp.faceVertexUvs;
+
+	depthMap = [];
+
+	faces.forEach(function(face, i){
+		var uv1 = faceVertexUvs[0][i][0];
+		var pixel1 = pixels.data[uv2xy(uv1, width, height)];
+
+		var uv2 = faceVertexUvs[0][i][1];
+		var pixel2 = pixels.data[uv2xy(uv2, width, height)];	
+
+		var uv3 = faceVertexUvs[0][i][2];
+		var pixel3 = pixels.data[uv2xy(uv3, width, height)];
+
+		var normal = face.normal;
+
+		depthMap[faces[i].a] = normal.clone().multiplyScalar(pixel1); 
+		depthMap[faces[i].b] = normal.clone().multiplyScalar(pixel2); 
+		depthMap[faces[i].c] = normal.clone().multiplyScalar(pixel3); 
+	});
+	return depthMap;
+}
+
+function uv2xy(uv, w, h){
+	var u = uv.y;
+	var v = uv.x;
+
+	if(u < 0 || u > 1 || v < 0 || v > 1){
+		var err = new Error("Invalid UV coordinates (" + u + ", " + v + ")");
+		return err.stack;
+	}
+
+	var x = (h - 1) - Math.floor(u * 1.0 * h);
+	var y = (w - 1) - Math.floor(v * 1.0 * w);
+
+	var row = x * (w * 4); 
+	var col = y * 4;
+	var index = row + col;
+
+	return index;
+}
+
+

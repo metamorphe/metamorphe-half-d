@@ -59,7 +59,7 @@ TactileController.prototype = {
 
 		var model = this.loaded[this.texture];
 		if(typeof model === "undefined") model = new TactileModel(textureMap[this.texture], 
-			70, 70, 2, 100, self.magnitude);
+			70, 70, 2, 150, self.magnitude);
 		model.load(this.engine, this.add, self);
 	},
 	add: function(tc, model){

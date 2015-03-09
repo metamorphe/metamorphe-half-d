@@ -5,6 +5,7 @@ Filters = {};
 Filters.getPixels = function(img){
 	var c = this.getCanvas(img.width, img.height);
 	var ctx = c.getContext('2d');
+	
 	ctx.drawImage(img, 0, 0, c.width, c.height);
 	return ctx.getImageData(0, 0, c.width, c.height);	
 };

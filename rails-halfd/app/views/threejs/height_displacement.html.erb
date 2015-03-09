@@ -59,7 +59,7 @@ TactileController.prototype = {
 
 		var model = this.loaded[this.texture];
 		if(typeof model === "undefined") model = new TactileModel(textureMap[this.texture], 
-			70, 70, 2, 150, self.magnitude);
+			70, 70, 2, 100, self.magnitude);
 		model.load(this.engine, this.add, self);
 	},
 	add: function(tc, model){
@@ -69,14 +69,22 @@ TactileController.prototype = {
 		tc.env.scene.add(tc.current_model[tc.engine].obj.mesh);
 		tc.preview.swap(textureMap[tc.texture]);
 		tc.mag();
-		alert.hide();
+		if(tc.engine == "bump")
+			alert.hide();
 		hist = generateURL();
 		history.pushState({}, hist.title, hist.href);
 	}, 
 	switch: function(){
 		console.log("Switching to", textureMap[this.texture]);
 		var self = this;
-		this.load();
+		UIAlert.sync(function(){
+			if(self.engine == "shade")
+				alert.flash("Switching to: " + textureMap[self.texture], 1500);
+			if(this.engine == "bump")
+				alert.notice("Calculating " + self.texture +  " model ...");
+			}, function(){
+				self.load();
+			});
 	},
 	mag: function(){
 		this.current_model.mag(this.engine, this.magnitude);
@@ -96,9 +104,11 @@ TactileController.prototype = {
 		// tc.switch();
 		var self = this;
 		this.current_model.save(this.texture);
+		alert.flash("Model saved!", 1000);
 	}, 
 	clear_cache: function(){
 		storage.clear();
+		alert.flash("Cleared cache", 1000);
 	}
 }
 

@@ -3,12 +3,13 @@ function ImagePreview(container, url){
 	this.dom = new Image();
 	this.dom.src = url;
 	$(this.dom).css({
-		position: "relative", 
+		position: "absolute", 
 		width: 100,
 		border: "1px solid #00A8E1", 
-		top: - $(container).height() + 72, 
+		top: 0, 
 		left: 0, 
-		"margin-top": -100,
+		margin: 5,
+		// "margin-top": -100,
 		"z-index": 100
 	}).appendTo(container);
 

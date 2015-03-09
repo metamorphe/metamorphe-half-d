@@ -1,4 +1,5 @@
 <%= javascript_include_tag 'metamorphehalf/planebox', 'data-turbolinks-track' => true %>
+<%= javascript_include_tag 'metamorphehalf/DimensionsPreview', 'data-turbolinks-track' => true %>
 
 
 <style type="text/css">
@@ -54,6 +55,8 @@ TactileController.prototype = {
 		var self = this;
 		this.load();
 		this.preview = new ImagePreview(this.env.container, textureMap[this.texture]);
+		this.dim = new DimensionsPreview(this.env.container);
+
 	},
 	load:function(){
 		console.log("Loading", this.texture, "on", this.engine);
@@ -77,10 +80,13 @@ TactileController.prototype = {
 		tc.env.scene.add(tc.current_model[tc.engine].obj.mesh);
 		tc.preview.swap(textureMap[tc.texture]);
 		tc.mag();
-		if(tc.engine == "bump")
+		if(tc.engine == "bump"){
 			alert.hide();
+			tc.update_dim();
+		}
 		hist = generateURL();
 		history.pushState({}, hist.title, hist.href);
+
 	}, 
 	switch: function(){
 		console.log("Switching to", textureMap[this.texture]);
@@ -96,6 +102,13 @@ TactileController.prototype = {
 	},
 	mag: function(){
 		this.current_model.mag(this.engine, this.magnitude);
+		this.update_dim();
+	},
+	update_dim: function(){
+		if(this.engine == "bump"){
+			var dimensions =  this.current_model.bump.dimensions();
+			this.dim.set(dimensions.x, dimensions.y, dimensions.z);
+		}
 	},
 	clear: function(){
 		console.log("Clearing the stage.");

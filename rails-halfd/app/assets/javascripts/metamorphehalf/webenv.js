@@ -35,10 +35,16 @@ WebEnv.prototype = {
 	}, 
 	setup: function(container){
 		this.scene = new THREE.Scene();
-		
+		this.scene.overrideMaterial = new THREE.MeshDepthMaterial();
 		// CAMERA
 		var SCREEN_WIDTH = $(".threejs_container").width(), SCREEN_HEIGHT = $(window).height();
-		var VIEW_ANGLE = 45, ASPECT = SCREEN_WIDTH / SCREEN_HEIGHT, NEAR = 0.1, FAR = 200000;
+		var VIEW_ANGLE = 45, ASPECT = SCREEN_WIDTH / SCREEN_HEIGHT, NEAR = 0.1, FAR = 20000000;
+		//NEAR = 50, FAR = 130;//FAR = 200000;
+		 
+
+        // create a camera, which defines where we're looking at.
+        // var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 10, 130);
+
 		this.camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR);
 		// this.camera = new THREE.OrthographicCamera( - ASPECT * VIEW_SIZE / 2,  ASPECT * VIEW_SIZE / 2,  VIEW_SIZE / 2,  -VIEW_SIZE / 2, -1000, 1000);
 		this.scene.add(this.camera);
@@ -46,7 +52,10 @@ WebEnv.prototype = {
 		this.camera.lookAt(this.scene.position);	
 		
 		// RENDERER
-		if ( Detector.webgl ) this.renderer = new THREE.WebGLRenderer( {antialias:true} );
+		if ( Detector.webgl ) this.renderer = new THREE.WebGLRenderer( {
+			antialias: true,
+			logarithmicDepthBuffer: true
+		});
 		else  this.renderer = new THREE.CanvasRenderer(); 
 		this.renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
 		container.appendChild( this.renderer.domElement );

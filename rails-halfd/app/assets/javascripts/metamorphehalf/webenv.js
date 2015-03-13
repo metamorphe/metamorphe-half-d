@@ -35,11 +35,11 @@ WebEnv.prototype = {
 	}, 
 	setup: function(container){
 		this.scene = new THREE.Scene();
-		this.scene.overrideMaterial = new THREE.MeshDepthMaterial();
+		// this.scene.overrideMaterial = new THREE.MeshDepthMaterial();
 		// CAMERA
 		var SCREEN_WIDTH = $(".threejs_container").width(), SCREEN_HEIGHT = $(window).height();
 		var VIEW_ANGLE = 45, ASPECT = SCREEN_WIDTH / SCREEN_HEIGHT, NEAR = 0.1, FAR = 20000000;
-		//NEAR = 50, FAR = 130;//FAR = 200000;
+		// var VIEW_ANGLE = 45, ASPECT = SCREEN_WIDTH / SCREEN_HEIGHT, NEAR = 50, FAR = 130;
 		 
 
         // create a camera, which defines where we're looking at.

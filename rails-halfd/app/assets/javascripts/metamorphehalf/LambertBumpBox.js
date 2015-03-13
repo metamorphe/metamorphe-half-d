@@ -133,7 +133,7 @@ function uv2xy(uv, w, h){
 		return err.stack;
 	}
 
-	var x = (h - 1) - Math.floor(u * 1.0 * h);
+	var x = Math.floor(u * 1.0 * h);
 	var y = (w - 1) - Math.floor(v * 1.0 * w);
 
 	var row = x * (w * 4); 

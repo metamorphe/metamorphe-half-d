@@ -3,6 +3,7 @@ function PlaneBox(h, w, d, h_s, w_s, d_s, material){
 	// TODO DEFAULTIZE h_s, w_s, d_s to 1
 	console.log(h, w, d, h_s, w_s, d_s);
 	this.depth = d;
+	// var geometry = new THREE.CylinderGeometry(20, 20, 20, h_s, w_s, d_s);
 	var geometry = new THREE.BoxGeometry(h, w, d, h_s, w_s, d_s);
 	geometry.dynamic = true;
 
@@ -24,7 +25,8 @@ PlaneBox.prototype = {
 		
 		// vertice indices
 		$.map(geom.vertices, function(el, i){
-			if(el.z >= self.depth/2.0) self.top_indices.push(i);
+			if(el.z >= self.depth/2.0) 
+				self.top_indices.push(i);
 		});
 
 

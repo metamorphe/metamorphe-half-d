@@ -3,7 +3,7 @@ Rails.application.routes.draw do
   devise_for :users
   resources :user, :only => ["show"]
 
-  resources :feel_swatches
+  # resources :feel_swatches
 
   resources :swatches do
     member do

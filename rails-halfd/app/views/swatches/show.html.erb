@@ -1,9 +1,41 @@
+<!-- BREADCRUMBS -->
 
+<div class="col-xs-12">
+  <!-- BREADCRUMBS -->
+    <ol class="breadcrumb">
+      <li>
+        <%= link_to swatches_path do %>
+          <%= glyph "arrow-left" %>
+        <% end%>
+      </li>
+      <li><a href=""><%= @swatch.layer.name.humanize %></a></li>
+      <li class="active"> <%= @swatch.name %> </li>
+    </ol>
+  <!-- END BREADCRUMBS -->
+  <div class="pull-right">
+    <span>
+      <%= link_to edit_swatch_path(@swatch) do %>
+        <%= glyph "edit" %>
+      <% end %>
+    </span>
+    <span>
+      <%= link_to  @swatch, method: :delete, data: { confirm: 'Are you sure?' }  do %>
+        <%= glyph "remove" %>
+        <% end %>
+    </span>
+  </div>
+
+</div>
+
+ 
+<!-- IMAGE COLUMN -->
 <div class='col-xs-5'>
   <div class="img-wrapper-large">
     <%= image_tag(@swatch.thumbnail, :width => "100%") if @swatch.thumbnail.present? %>
   </div>
 </div>
+<!-- END IMAGE COLUMN -->
+<!-- INFORMATION COLUMN -->
 <div class="col-xs-7">
   <div class="col-xs-6">
     <h2>
@@ -17,11 +49,10 @@
       <%= image_tag(@swatch.bump_map, :width => "100%") if @swatch.bump_map.present? %>
     </div>
   </div>
-<p>
+
+
+  <!-- DIMENSIONS TABLE -->
   <h3> Dimensions </h3>
-
-</p>
-
   <table class="table">
     <tr>
       <th>W</th>
@@ -39,18 +70,16 @@
     </tr>
   </table>
 
+  <!-- EXTERNAL FILES -->
   <%=link_to @swatch.stl, :class => "btn btn-default" do %>
     <%= glyph("download") %> STL 
   <% end %>
    <%=link_to threed_swatch_path(@swatch, {:texture => @swatch.bump_map_identifier.split(".")[0], :engine => "shade"}), :class => "btn btn-default" do %>
     <%= glyph("eye") %> View 3D 
   <% end %>
-  
-
-  <br> 
-  <%= link_to 'Edit', edit_swatch_path(@swatch) %> |
-  <%= link_to 'Back', swatches_path %>
+ 
 </div>
+<!-- END INFORMATION COLUMN -->
 
 
 

@@ -12,24 +12,13 @@
 
 		<div> 
 			<h2> 
-				<span class='cat'> </span> 
+				<span class='cat'> <%= swatch.layer.name%> </span> 
 				<%= swatch.name %>
 			</h2>
-			<label> Dimensions </label>
+			
+			
 
-			<span>BH: <%= swatch.base_height %></span>
-			<span>D: <%= swatch.displacement %></span>
-			<span>H: <%= swatch.height %></span>
-			<span>W: <%= swatch.width %></span>
-			<span>D: <%= swatch.depth %></span>
-
-			<p><%= swatch.stl %></p>
-			<p><%= swatch.thumbnail %></p>
-			<p><%= swatch.user.email %></p>
-
-			<span><%= link_to 'Show', swatch %></span>
-			<span><%= link_to 'Edit', edit_swatch_path(swatch) %></span>
-			<span><%= link_to 'Destroy', swatch, method: :delete, data: { confirm: 'Are you sure?' } %></span>
+			
 		</div>
 	<% end %>
 </div>

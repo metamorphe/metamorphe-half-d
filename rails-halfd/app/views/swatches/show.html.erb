@@ -71,11 +71,11 @@
   </table>
 
   <!-- EXTERNAL FILES -->
-  <%=link_to @swatch.stl, :class => "btn btn-default" do %>
+  <%=link_to @swatch.stl_url, :class => "btn btn-default", :download => @swatch.name.downcase + ".stl" do %>
     <%= glyph("download") %> STL 
   <% end %>
    <%=link_to threed_swatch_path(@swatch, {:texture => @swatch.bump_map_identifier.split(".")[0], :engine => "shade"}), :class => "btn btn-default" do %>
-    <%= glyph("eye") %> View 3D 
+    <%= glyph("eye-open") %> View 3D 
   <% end %>
  
 </div>

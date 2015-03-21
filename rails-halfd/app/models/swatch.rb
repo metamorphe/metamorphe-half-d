@@ -16,6 +16,7 @@
 class Swatch < ActiveRecord::Base
 	mount_uploader :thumbnail, ThumbnailUploader
 	mount_uploader :bump_map, BumpMapUploader
+	mount_uploader :stl, StlUploader
 
 	belongs_to :user
 	belongs_to :layer

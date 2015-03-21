@@ -18,16 +18,20 @@
 
 
 /* LIBRARY NODE CSS */
-
+.small-span{
+	font-size: 0.8em;
+}
 .library-block{
 	/*margin: 10px 10px;*/
-	height: 220px;
-	margin: 4px 0%;
+	height: 200px;
+	margin: 0 0;
+	padding: 0 4px;
 	width: 100%;
 	background: #F8F8F8;
 	cursor: pointer;
 	overflow: hidden;
 	border: 1px solid #E6E6E6;
+	position: relative;
 }
 .library-block:hover{
 	background: white;
@@ -41,7 +45,12 @@
 
 	font-size: 8pt;
 	margin-right: 6px;
-	display: none;
+	position: absolute;
+	top: 4px;
+	left: 4px;
+	margin-bottom: -20px;
+	/*margin-right: -100px;*/
+	/*display: none;*/
 
 }
 .library-wrapper{
@@ -57,6 +66,10 @@ div.library-block-wrapper{
 .library-block h2{
 	font-size: 12pt;
 	text-align: center;
+	margin-top: 0;
+	display: block;
+	overflow: hidden;
+	margin-bottom: 4px;
 }
 div.img-wrapper{
 	overflow: hidden;

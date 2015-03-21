@@ -1,8 +1,8 @@
-<h1>Swatch Library</h1>
+<h3>Swatch Library</h3>
 
 
 <div class="row">
-   <% @swatches.each do |swatch| %>
+   <% @swatches.reverse.each do |swatch| %>
       <%= render :partial => "node", :locals => {:swatch => swatch} %>
     <% end %>
 </div>

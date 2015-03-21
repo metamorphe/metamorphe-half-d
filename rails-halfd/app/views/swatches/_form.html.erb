@@ -18,6 +18,11 @@
     <%= f.label :name %><br>
     <%= f.text_field :name %>
   </div>
+  <div class="field">
+    <%= f.label :is_dynamic %><br>
+    <%= check_box "swatch", :is_dynamic%>
+  </div>
+
    <div class="field">
     <%= f.label :thumbnail %><br>
     <%= f.file_field :thumbnail %>
@@ -46,6 +51,8 @@
     <%= f.label :depth.to_s + " (mm)" %><br>
     <%= f.text_field :depth, value: "4.0"%>
   </div>
+
+
   <div class="field">
     <%= f.label :stl %><br>
     <%= f.file_field :stl %>

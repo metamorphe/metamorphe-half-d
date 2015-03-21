@@ -9,6 +9,7 @@
 # t.string   "thumbnail"
 # t.integer  "user_id"
 # t.integer  "layer_id"
+# t.boolean  "is_dynamic"
 # t.datetime "created_at"
 # t.datetime "updated_at"
 
@@ -22,8 +23,7 @@ class Swatch < ActiveRecord::Base
 	belongs_to :layer
 
 	validates :name, :bump_map, :base_height, :displacement, :height, :width, :depth, :thumbnail, :user_id, :layer_id, :presence => true
-	validates :name, :uniqueness => true
-	 
+	validates :name, :uniqueness => true 
 end
 
 

@@ -15,12 +15,12 @@
   <div class="pull-right">
     <span>
       <%= link_to edit_swatch_path(@swatch) do %>
-        <%= glyph "edit" %>
+        <%= glyph "edit" %> Edit
       <% end %>
     </span>
     <span>
       <%= link_to  @swatch, method: :delete, data: { confirm: 'Are you sure?' }  do %>
-        <%= glyph "remove" %>
+        <%= glyph "remove" %> Destroy
         <% end %>
     </span>
   </div>
@@ -43,6 +43,13 @@
       <%= @swatch.name %> 
     </h2>
     <p> <em> author </em> <%= link_to @swatch.user.email, user_path(@swatch.user)%></p>
+    <p>
+      <% if @swatch.is_dynamic %>
+      <%= glyph("check") %> Dynamic
+      <% else %>
+      <%= glyph("remove") %> Dynamic
+      <% end %> 
+    </p>
   </div>
   <div class="col-xs-6">
     <div class="img-wrapper">

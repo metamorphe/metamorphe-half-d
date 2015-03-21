@@ -74,6 +74,6 @@ class SwatchesController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def swatch_params
-      params.require(:swatch).permit(:name, :bump_map, :base_height, :displacement, :height, :width, :depth, :stl, :thumbnail, :layer_id)
+      params.require(:swatch).permit(:name, :bump_map, :base_height, :displacement, :height, :width, :depth, :stl, :thumbnail, :layer_id, :is_dynamic)
     end
 end

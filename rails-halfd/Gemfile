@@ -48,3 +48,4 @@ gem 'bootstrap-sass',
 gem 'threejs-rails', git: 'git://github.com/marvindanig/threejs-rails.git'
 gem 'markdown-rails'
 gem 'd3-rails'
+gem 'devise'

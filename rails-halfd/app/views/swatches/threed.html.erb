@@ -1,6 +1,7 @@
 
-<%= javascript_include_tag 'metamorphehalf/planebox', 'data-turbolinks-track' => true %>
-<%= javascript_include_tag 'metamorphehalf/DimensionsPreview', 'data-turbolinks-track' => true %>
+<%= javascript_include_tag 'threejs' %>
+<%= javascript_include_tag 'metamorphehalf/planebox' %>
+<%= javascript_include_tag 'metamorphehalf/DimensionsPreview' %>
 
 
 <style type="text/css">
@@ -13,7 +14,6 @@ var tc, storage, alert, depthWorker, textureNames, textureMap;
 
 
 $(function(){
-	initWorkers();
 	storage = new WebStorage();
 	tc = new TactileController();
 	textureNames = $.map(TactileController.textures, function(el, i){
@@ -27,16 +27,6 @@ $(function(){
 	
 });
 
-function workPackage(texture, geom){
-	this.pixels = Filters.filterImage(Filters.grayscale, texture.image);
-	this.faces = geom.faces;
-	this.faceVertexUvs = geom.faceVertexUvs;
-}
-
-function initWorkers(){
-	depthWorker = new Worker('/assets/metamorphehalf/ScanWorker.js');
-}
-
 function TactileController(){
 	this.texture = GET().texture || "corn";
 	this.engine = GET().engine || "shade";
@@ -48,8 +38,12 @@ function TactileController(){
 	this.base_height = 2;
 
 }
-
-TactileController.textures =  <%= @files %>;
+function workPackage(texture, geom){
+	this.pixels = Filters.filterImage(Filters.grayscale, texture.image);
+	this.faces = geom.faces;
+	this.faceVertexUvs = geom.faceVertexUvs;
+}
+TactileController.textures =  <%= [@swatch.bump_map_url].to_s.html_safe %>;
 
 TactileController.prototype = {
 	init: function(){
@@ -202,7 +196,7 @@ function configureGUI(tc){
 function generateURL(){
 	return {
 		title: tc.texture + " rendered as " + tc.engine,
-		href: "height_displacement?engine=" + tc.engine +"&" + "texture=" + tc.texture
+		href: "threed?engine=" + tc.engine +"&" + "texture=" + tc.texture
 		}
 }
 </script>

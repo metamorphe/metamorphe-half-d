@@ -1,0 +1,2 @@
+class StructureSwatch < Swatch
+end

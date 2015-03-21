@@ -5,3 +5,6 @@
 #
 #   cities = City.create([{ name: 'Chicago' }, { name: 'Copenhagen' }])
 #   Mayor.create(name: 'Emanuel', city: cities.first)
+
+
+layers = Layer.create([{name: "Surface", name: "Structure", name: "Interactive", name: "Weight"}]);

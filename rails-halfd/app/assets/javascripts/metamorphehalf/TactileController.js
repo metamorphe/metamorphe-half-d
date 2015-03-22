@@ -2,7 +2,7 @@ function TactileController(){
 	this.texture = GET().texture || "corn";
 	this.engine = GET().engine || "shade";
 	this.current_model;
-	this.magnitude = GET().mag || 5.0;
+	this.magnitude = parseFloat(GET()).mag || 5.0;
 	this.loaded = {};
 	this.env = new WebEnv($("#ThreeJS"));
 	this.preview;

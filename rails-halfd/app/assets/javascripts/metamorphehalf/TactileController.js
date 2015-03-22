@@ -2,12 +2,14 @@ function TactileController(){
 	this.texture = GET().texture || "corn";
 	this.engine = GET().engine || "shade";
 	this.current_model;
-	this.magnitude = 5.0;
+	this.magnitude = GET().mag || 5.0;
 	this.loaded = {};
 	this.env = new WebEnv($("#ThreeJS"));
 	this.preview;
-	this.base_height = 2;
-
+	this.base_height = GET().bh || 2;
+	this.width = GET().w || 70;
+	this.height = GET().h || 70;
+	this.resolution = GET().r || 150;
 }
 
 
@@ -25,13 +27,13 @@ TactileController.prototype = {
 
 		var model = this.loaded[this.texture];
 		if(typeof model === "undefined") model = new TactileModel(textureMap[this.texture], 
-			70, 70, this.base_height, 150, self.magnitude);
+			this.width, this.height, this.base_height, this.resolution, self.magnitude);
 		model.load(this.engine, this.add, self);
 	},
 	bh_adj: function(){
 		var self = this;
 		var model = new TactileModel(textureMap[this.texture], 
-			70, 70, this.base_height, 150, self.magnitude);
+			this.width, this.height, this.base_height, this.resolution, self.magnitude);
 		model.load(this.engine, this.add, self);
 	},
 	add: function(tc, model){

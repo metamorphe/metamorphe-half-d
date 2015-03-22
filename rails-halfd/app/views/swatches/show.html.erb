@@ -92,6 +92,7 @@
                 :engine => "shade"
               }), 
                 :class => "btn btn-default", 
+                :disabled => @swatch.stl.blank?,
                 :title => "View 3D" do %>
                   <%= glyph("eye-open") %> 
   <% end %>

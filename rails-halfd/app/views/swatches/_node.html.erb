@@ -16,7 +16,7 @@
 					<span class="small-span pull-left"> <%= swatch.created_at.strftime("%_d %b %Y") %></span>
 					<%=link_to swatch.stl_url, :class => "btn btn-default btn-xs pull-right", 
 								:download => swatch.name.downcase + ".stl",
-								:disabled => swatch.stl.nil?,
+								:disabled => swatch.stl.blank?,
 								:title => "Download STL" do %>
 									<%= glyph("download") %>
 					<% end %>

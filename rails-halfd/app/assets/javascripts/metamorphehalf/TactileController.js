@@ -72,7 +72,8 @@ TactileController.prototype = {
 			var dimensions =  this.current_model.bump.dimensions();
 			this.dim.set(dimensions.x, dimensions.y, dimensions.z);
 		}
-		this.dim.set(0, 0, 0);
+		else
+			this.dim.set(0, 0, 0);
 	},
 	clear: function(){
 		console.log("Clearing the stage.");

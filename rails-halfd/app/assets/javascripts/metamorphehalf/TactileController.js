@@ -6,10 +6,10 @@ function TactileController(){
 	this.loaded = {};
 	this.env = new WebEnv($("#ThreeJS"));
 	this.preview;
-	this.base_height = GET().bh || 2;
-	this.width = GET().w || 70;
-	this.height = GET().h || 70;
-	this.resolution = GET().r || 150;
+	this.base_height = parseFloat(GET().bh) || 2;
+	this.width = parseFloat(GET().w) || 70;
+	this.height = parseFloat(GET().h) || 70;
+	this.resolution = parseFloat(GET().r) || 150;
 }
 
 

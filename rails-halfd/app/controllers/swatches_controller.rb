@@ -14,6 +14,7 @@ class SwatchesController < ApplicationController
   end
 
   def threed  
+    @files = [@swatch.bump_map_url].to_json.html_safe
     render :layout => "full_screen" 
   end
 

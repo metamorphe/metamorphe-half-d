@@ -21,8 +21,11 @@
 //= require metamorphehalf/LambertBumpBox
 //= require metamorphehalf/ShaderBumpBox
 //= require metamorphehalf/Filters
-//= require ui_alert
+//= require metamorphehalf/TactileModel
+//= require metamorphehalf/TactileController
+//= require metamorphehalf/TactileEnvironment
 
+//= require ui_alert
 
 
 @clone_vec_array = (arr) ->

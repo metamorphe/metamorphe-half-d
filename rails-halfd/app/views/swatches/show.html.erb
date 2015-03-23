@@ -78,7 +78,9 @@
   </table>
 
   <!-- EXTERNAL FILES -->
-  <%=link_to @swatch.stl_url, :class => "btn btn-default", :download => @swatch.name.downcase + ".stl" do %>
+  <%=link_to @swatch.stl_url, :class => "btn btn-default", 
+  :disabled => @swatch.stl.blank?,
+  :download => @swatch.name.downcase + ".stl" do %>
     <%= glyph("download") %> STL 
   <% end %>
    <%=link_to threed_swatch_path(@swatch, 
@@ -92,7 +94,6 @@
                 :engine => "shade"
               }), 
                 :class => "btn btn-default", 
-                :disabled => @swatch.stl.blank?,
                 :title => "View 3D" do %>
                   <%= glyph("eye-open") %> 
   <% end %>

@@ -1,0 +1,56 @@
+<%= javascript_include_tag "paper-full.min" %>
+<%= javascript_include_tag "scraps/generator" %>
+
+<script type="text/javascript">
+  var factory;
+  $(function(){
+    attachHandlers();
+    // // var flui = <%= @flui.to_json.html_safe %>;
+    factory = new TextureGenerator();
+  });
+  function attachHandlers(){
+    $('#download').click(function(){
+      $(this).attr('href', 'data:text/svg,' + factory.export() )
+      .attr('download', 'myflui.svg');
+    });
+    $('#form-errors').hide();
+    $('#form-success').hide();
+    $('form').submit(function(e){
+      $('#form-errors').hide().html('');
+      $('#form-success').hide().html('');
+      var vals = $('form').serializeArray();
+      console.log(vals);
+      resp = validate(vals);
+      if(resp.status) $('#form-errors').show().html(resp.message);
+      else $('#form-success').show().html("Generated below!");
+      return false;
+    });
+    $('#plus').click(function(){
+      factory.paper.view.zoom += 0.1;
+    });
+    $('#minus').click(function(){
+      if(factory.paper.view.zoom > 0.2)
+        factory.paper.view.zoom -= 0.1;
+    });
+  }
+</script>
+
+<div class="row">
+  <div class="col-xs-6">  
+  </div>
+
+  <div class="col-xs-6">
+     <div id="svg-loader"></div>
+    <p id="zoom"> 
+      <button type="button" id="minus" class="btn btn-default btn-xs">
+        <span class="glyphicon glyphicon-minus"></span>
+      </button>
+      <button type="button" id="plus" class="btn btn-default btn-xs">
+        <span class="glyphicon glyphicon-plus"></span> 
+      </button>
+    </p>
+    <p id="dimensions"></p> 
+    <div id="flui-generator"></div> 
+    <a id="download" style="margin-top: 8px" class="btn btn-primary pull-right">Download</a>
+  </div>
+</div>

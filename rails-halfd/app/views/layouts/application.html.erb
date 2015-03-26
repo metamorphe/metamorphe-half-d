@@ -4,8 +4,10 @@
   <title>2.5D - <%= params[:action].humanize %></title>
   <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true %>
   <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
+  <!-- <%=params[:controller]%> -->
   <% if params[:controller] != "application" %>
 	  <%= stylesheet_link_tag params[:controller], media: 'all', 'data-turbolinks-track' => true %>
+	  
 	  <%= javascript_include_tag params[:controller], 'data-turbolinks-track' => true %>
   <% end %>
   
@@ -65,6 +67,7 @@
         		<li><%= link_to "cooccurrence", cooccurrence_path, :class=> "navbar-link"  %> </li>
         		<li><%= link_to "planebox", plane_box_path, :class=> "navbar-link"  %> </li>
         		<li><%= link_to "threejs_env", three_env_path , :class=> "navbar-link" %> </li>
+        		<li><%= link_to "generator", paperscraps_generate_path , :class=> "navbar-link" %> </li>
 	          </ul>
 			</li>
 				  	

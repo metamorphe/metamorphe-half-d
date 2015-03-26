@@ -6,7 +6,6 @@
 // You can use Sass (SCSS) here: http://sass-lang.com/
 /*
 *= require normalize-rails
-*= require bootstrap
 *= require_self
 */
 .thumbnail .legend{
@@ -36,9 +35,9 @@
 input{
 	text-align: right;
 }
-#flui-generator{
-	width: 100%;
-	height: 600px;
+#generator{
+	height: 506px;
+	width: 506px;
 	border: #DDD solid 3px;
 }
 #svg-loader{

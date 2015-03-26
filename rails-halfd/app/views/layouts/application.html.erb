@@ -4,8 +4,10 @@
   <title>2.5D - <%= params[:action].humanize %></title>
   <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true %>
   <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
+  <!-- <%=params[:controller]%> -->
   <% if params[:controller] != "application" %>
 	  <%= stylesheet_link_tag params[:controller], media: 'all', 'data-turbolinks-track' => true %>
+	  
 	  <%= javascript_include_tag params[:controller], 'data-turbolinks-track' => true %>
   <% end %>
   

@@ -1,5 +1,7 @@
 Rails.application.routes.draw do
 
+  get 'paperscraps/generate'
+
   devise_for :users
   resources :user, :only => ["show"]
 

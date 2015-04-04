@@ -1,0 +1,48 @@
+<div class='col-md-4 col-lg-2 col-xs-6 library-wrapper'>
+	<%= link_to swatch_path(swatch.id) do %>
+		<div class='library-block' data-id="<%= swatch.id %>">	
+				<div class='img-wrapper'>
+					<%= image_tag(swatch.thumbnail_url, :width => "100%") if swatch.thumbnail.present? %>
+
+				</div>
+
+				<div> 
+					<span class='cat'> <%= swatch.layer.name %> </span> 
+					<h2>
+						<span id="swatch_name" class="pull-left"><%= swatch.name %> </span>
+						
+						
+					</h2>
+					<span class="small-span pull-left"> <%= swatch.created_at.strftime("%_d %b %Y") %></span>
+					<%=link_to swatch.stl_url, :class => "btn btn-default btn-xs pull-right", 
+								:download => swatch.name.downcase + ".stl",
+								:disabled => swatch.stl.blank?,
+								:title => "Download STL" do %>
+									<%= glyph("download") %>
+					<% end %>
+				
+					<%=link_to threed_swatch_path(swatch, 
+							{
+								:texture => swatch.bump_map_identifier.split(".")[0], 
+								:engine => "shade",
+								:h => swatch.height,
+								:w => swatch.width,
+								:b => swatch.base_height,
+								:mag => swatch.displacement,
+								:engine => "shade"
+							}), 
+								:class => "btn btn-default btn-xs pull-right", 
+								:title => "View 3D" do %>
+									<%= glyph("eye-open") %> 
+					<% end %>
+				</div>
+		</div>
+	<% end %>
+</div>
+
+
+
+
+
+ <!-- image_tag_check library.img_thumb -->
+			

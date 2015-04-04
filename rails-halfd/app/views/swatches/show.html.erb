@@ -1,0 +1,105 @@
+<!-- BREADCRUMBS -->
+
+<div class="col-xs-12">
+  <!-- BREADCRUMBS -->
+    <ol class="breadcrumb">
+      <li>
+        <%= link_to swatches_path do %>
+          <%= glyph "arrow-left" %>
+        <% end%>
+      </li>
+      <li><a href=""><%= @swatch.layer.name.humanize %></a></li>
+      <li class="active"> <%= @swatch.name %> </li>
+    </ol>
+  <!-- END BREADCRUMBS -->
+  <div class="pull-right">
+    <span>
+      <%= link_to edit_swatch_path(@swatch) do %>
+        <%= glyph "edit" %> Edit
+      <% end %>
+    </span>
+    <span>
+      <%= link_to  @swatch, method: :delete, data: { confirm: 'Are you sure?' }  do %>
+        <%= glyph "remove" %> Destroy
+        <% end %>
+    </span>
+  </div>
+
+</div>
+
+ 
+<!-- IMAGE COLUMN -->
+<div class='col-xs-5'>
+  <div class="img-wrapper-large">
+    <%= image_tag(@swatch.thumbnail, :width => "100%") if @swatch.thumbnail.present? %>
+  </div>
+</div>
+<!-- END IMAGE COLUMN -->
+<!-- INFORMATION COLUMN -->
+<div class="col-xs-7">
+  <div class="col-xs-6">
+    <h2>
+      <em> <%= @swatch.layer.name %></em>
+      <%= @swatch.name %> 
+    </h2>
+    <p> <em> author </em> <%= link_to @swatch.user.email, user_path(@swatch.user)%></p>
+    <p>
+      <% if @swatch.is_dynamic %>
+      <%= glyph("check") %> Dynamic
+      <% else %>
+      <%= glyph("remove") %> Dynamic
+      <% end %> 
+    </p>
+  </div>
+  <div class="col-xs-6">
+    <div class="img-wrapper">
+      <%= image_tag(@swatch.bump_map, :width => "100%") if @swatch.bump_map.present? %>
+    </div>
+  </div>
+
+
+  <!-- DIMENSIONS TABLE -->
+  <h3> Dimensions </h3>
+  <table class="table">
+    <tr>
+      <th>W</th>
+      <th>H</th>
+      <th>D</th>
+      <th>&Delta;</th>
+      <th>BH</th>
+    </tr>
+    <tr>
+      <td><%=@swatch.width%></td>
+      <td><%=@swatch.height%></td>
+      <td><%=@swatch.depth%></td>
+      <td> <%=@swatch.displacement%></td>
+      <td> <%=@swatch.base_height%></td> 
+    </tr>
+  </table>
+
+  <!-- EXTERNAL FILES -->
+  <%=link_to @swatch.stl_url, :class => "btn btn-default", 
+  :disabled => @swatch.stl.blank?,
+  :download => @swatch.name.downcase + ".stl" do %>
+    <%= glyph("download") %> STL 
+  <% end %>
+   <%=link_to threed_swatch_path(@swatch, 
+              {
+                :texture => @swatch.bump_map_identifier.split(".")[0], 
+                :engine => "shade",
+                :h => @swatch.height,
+                :w => @swatch.width,
+                :b => @swatch.base_height,
+                :mag => @swatch.displacement,
+                :engine => "shade"
+              }), 
+                :class => "btn btn-default", 
+                :title => "View 3D" do %>
+                  <%= glyph("eye-open") %> 
+  <% end %>
+ 
+</div>
+<!-- END INFORMATION COLUMN -->
+
+
+

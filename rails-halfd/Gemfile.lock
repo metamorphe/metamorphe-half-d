@@ -43,6 +43,7 @@ GEM
       thread_safe (~> 0.1)
       tzinfo (~> 1.1)
     arel (5.0.1.20140414130214)
+    bcrypt (3.1.7)
     builder (3.2.2)
     carrierwave (0.10.0)
       activemodel (>= 3.2.0)
@@ -59,6 +60,12 @@ GEM
     d3-rails (3.4.4)
       railties (>= 3.1)
     daemons (1.1.9)
+    devise (3.2.4)
+      bcrypt (~> 3.0)
+      orm_adapter (~> 0.1)
+      railties (>= 3.2.6, < 5)
+      thread_safe (~> 0.1)
+      warden (~> 1.2.3)
     erubis (2.7.0)
     eventmachine (1.0.5)
     execjs (2.2.2)
@@ -80,6 +87,9 @@ GEM
     mime-types (1.25.1)
     minitest (5.5.1)
     multi_json (1.10.1)
+    mysql2 (0.3.16)
+    normalize-rails (3.0.1)
+    orm_adapter (0.5.0)
     polyglot (0.3.5)
     rack (1.5.2)
     rack-test (0.6.3)
@@ -103,7 +113,6 @@ GEM
     rdiscount (1.6.8)
     rdoc (4.2.0)
       json (~> 1.4)
-    rmagick (2.13.4)
     sass (3.2.19)
     sass-rails (4.0.5)
       railties (>= 4.0.0, < 5.0)
@@ -141,6 +150,8 @@ GEM
     uglifier (2.7.0)
       execjs (>= 0.3.0)
       json (>= 1.8.0)
+    warden (1.2.3)
+      rack (>= 1.0)
 
 PLATFORMS
   ruby
@@ -150,11 +161,13 @@ DEPENDENCIES
   carrierwave
   coffee-rails (~> 4.0.0)
   d3-rails
+  devise
   jbuilder (~> 2.0)
   jquery-rails
   markdown-rails
+  mysql2
+  normalize-rails
   rails (= 4.1.4)
-  rmagick (~> 2.13.2)
   sass-rails (~> 4.0.3)
   sdoc (~> 0.4.0)
   spring

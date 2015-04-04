@@ -32,7 +32,17 @@ WebStorage.prototype = {
 	set: function(k, v){
 		if(typeof k === "undefined") return; // don't store undefined
 		if(!this.check_valid) return;
-		this.store.setItem(k, v)
+		try {
+		  this.store.setItem(k, v)
+		} catch (e) {
+		  if (e.code == DOMException.QUOTA_EXCEEDED_ERR) {
+		    this.clear();
+		    this.set(l, v);
+		  }
+		  else{
+		  	console.log(e);
+		  }
+		}
 	}, 
 	get: function(k){
 		if(!this.check_valid) return;

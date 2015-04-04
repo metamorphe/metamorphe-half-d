@@ -1,0 +1,2 @@
+class TextureSwatch < Swatch
+end

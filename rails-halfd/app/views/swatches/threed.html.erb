@@ -1,0 +1,34 @@
+
+<%= stylesheet_link_tag 'threejs'%>
+<%= javascript_include_tag 'threejs' %>
+<%= javascript_include_tag 'metamorphehalf/planebox' %>
+<%= javascript_include_tag 'metamorphehalf/DimensionsPreview' %>
+
+
+<script type="text/javascript">
+TactileController.textures =  <%= @files %>;
+
+var te;
+
+$(function(){
+	te = new TactileEnvironment();
+	$(window).resize();
+});
+
+function generateURL(){
+	return {
+		title: tc.texture + " rendered as " + tc.engine,
+		href: "threed?engine=" + tc.engine +"&" + "texture=" + tc.texture
+		}
+}
+</script>
+
+<style type="text/css">
+	#texture-render{
+		display: none;
+	}
+</style>
+<div class="threejs_container">
+<div id="ThreeJS" ></div>
+</div>
+<canvas id="texture-render" ></canvas>

@@ -25,6 +25,9 @@ BumpBox.loadTexture = function(url, ready){
 	console.log("Trying to load", url);
 	var bumpTexture = new THREE.ImageUtils.loadTexture(url, THREE.UVMapping, function(texture){
 		console.log("Successfully loaded texture!", url);
+		// texture.wrapS = texture.wrapT = THREE.RepeatWrapping; 
+	texture.wrapS = texture.wrapT = THREE.ClampToEdgeWrapping; 
+	texture.minFilter = THREE.LinearFilter;
 		ready(texture);
 	});
 }

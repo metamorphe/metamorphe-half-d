@@ -26,11 +26,13 @@ UIAlert.prototype = {
 	},
 	flash: function(msg, ms, fn){
 		var self = this;
-		this.dom.find('#msg').html(msg);
-		this.dom.show(function(){
-			fn();
-			self.dom.fadeOut(ms);
-		});
+		this.notice(msg);
+		setTimeout(function(){
+				if(typeof fn !== "undefined")
+					fn();
+			self.dom.fadeOut();
+		}, ms);
+	
 	},
 	show: function(){
 		this.dom.show();
@@ -39,3 +41,8 @@ UIAlert.prototype = {
 		this.dom.fadeOut();
 	}
 }
+
+UIAlert.sync = function(ui, done){
+	ui();
+	done();
+};

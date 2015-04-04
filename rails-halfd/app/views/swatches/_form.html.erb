@@ -1,0 +1,65 @@
+<%= form_for @swatch, :html => {:multipart => true}  do |f| %>
+  <% if @swatch.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@swatch.errors.count, "error") %> prohibited this swatch from being saved:</h2>
+
+      <ul>
+      <% @swatch.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+  <div class="field">
+     <%= f.label :layer_id %><br>
+  <%= select("swatch", "layer_id", Layer.all.collect {|p| [ p.name, p.id ] }) %>
+  </div>
+  <div class="field">
+    <%= f.label :name %><br>
+    <%= f.text_field :name %>
+  </div>
+  <div class="field">
+    <%= f.label :is_dynamic %><br>
+    <%= check_box "swatch", :is_dynamic%>
+  </div>
+
+   <div class="field">
+    <%= f.label :thumbnail %><br>
+    <%= f.file_field :thumbnail %>
+  </div>
+  <div class="field">
+    <%= f.label :bump_map %><br>
+    <%= f.file_field :bump_map %>
+  </div>
+  <div class="field">
+    <%= f.label :base_height %><br>
+    <%= f.text_field :base_height, value: "2.0" %>
+  </div>
+  <div class="field">
+    <%= f.label :displacement %><br>
+    <%= f.text_field :displacement, value: "2.0" %>
+  </div>
+  <div class="field">
+    <%= f.label :height.to_s + " (mm)" %><br>
+    <%= f.text_field :height, value: "70.0" %>
+  </div>
+  <div class="field">
+    <%= f.label :width.to_s + " (mm)" %><br>
+    <%= f.text_field :width, value: "70.0" %>
+  </div>
+  <div class="field">
+    <%= f.label :depth.to_s + " (mm)" %><br>
+    <%= f.text_field :depth, value: "4.0"%>
+  </div>
+
+
+  <div class="field">
+    <%= f.label :stl %><br>
+    <%= f.file_field :stl %>
+  </div>
+
+ 
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

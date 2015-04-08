@@ -1,9 +1,10 @@
 
-function TactileModel(texture, h, w, d, resolution, mag){
+function TactileModel(texture, h, w, d, resolution, mag, shape){
 	this.name = texture;
 	this.path = textureMap[texture];
-	this.shade = new ShaderBumpBox(texture, mag, h, w, d, resolution);   
-	this.bump = new LambertBumpBox(texture, mag,  h, w, d, resolution);
+	this.shape = shape;
+	this.shade = new ShaderBumpBox(texture, mag, h, w, d, resolution, shape);   
+	this.bump = new LambertBumpBox(texture, mag,  h, w, d, resolution, shape);
 }
 
 TactileModel.prototype = {

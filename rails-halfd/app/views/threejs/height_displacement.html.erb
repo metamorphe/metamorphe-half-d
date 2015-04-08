@@ -1,6 +1,6 @@
 
 <% javascript_include_tag 'metamorphehalf/planebox', 'data-turbolinks-track' => true %>
-<% javascript_include_tag 'metamorphehalf/TextureCylinder', 'data-turbolinks-track' => true %>
+<%= javascript_include_tag 'metamorphehalf/TextureCylinder', 'data-turbolinks-track' => true %>
 <%= javascript_include_tag 'metamorphehalf/DimensionsPreview', 'data-turbolinks-track' => true %>
 
 
@@ -17,7 +17,7 @@ $(function(){
 function generateURL(){
 	return {
 		title: tc.texture + " rendered as " + tc.engine,
-		href: "height_displacement?engine=" + tc.engine +"&" + "texture=" + tc.texture
+		href: "height_displacement?engine=" + tc.engine +"&" + "texture=" + tc.texture + "&" + "shape=" + tc.shape
 		}
 }
 </script>

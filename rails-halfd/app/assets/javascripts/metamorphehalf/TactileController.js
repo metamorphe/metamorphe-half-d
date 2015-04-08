@@ -1,6 +1,7 @@
 function TactileController(){
 	this.texture = GET().texture || "corn";
 	this.engine = GET().engine || "shade";
+	this.shape = GET().shape || "plane";
 	this.current_model;
 	this.magnitude = parseFloat(GET()).mag || 2.0;
 	this.loaded = {};
@@ -27,7 +28,7 @@ TactileController.prototype = {
 
 		var model = this.loaded[this.texture];
 		if(typeof model === "undefined") model = new TactileModel(textureMap[this.texture], 
-			this.width, this.height, this.base_height, this.resolution, self.magnitude);
+			this.width, this.height, this.base_height, this.resolution, self.magnitude, this.shape);
 		model.load(this.engine, this.add, self);
 	},
 	bh_adj: function(){
@@ -51,6 +52,9 @@ TactileController.prototype = {
 		history.pushState({}, hist.title, hist.href);
 
 	}, 
+	shape_shift: function(){
+		console.log("Shape shifting to", this.shape);
+	},
 	switch: function(){
 		console.log("Switching to", textureMap[this.texture]);
 		var self = this;

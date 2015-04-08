@@ -31,6 +31,11 @@ TactileEnvironment.configureGUI = function(tc){
 		// img_preview.swap(model.directory + model.filename);
 	});
 
+	var shapeController = gui.add(tc, 'shape', ["plane", "cylinder"]);
+	shapeController.onChange(function(){
+		tc.shape_shift();
+	});
+
 	var engineController = gui.add(tc, 'engine', ["shade", "bump"]);
 	engineController.onChange(function(){ tc.switch(); });
 

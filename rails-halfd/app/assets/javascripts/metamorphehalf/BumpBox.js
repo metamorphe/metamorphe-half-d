@@ -20,7 +20,7 @@ BumpBox.make = function(h, w, d, resolution, material){
 
 	// var cy_radius = 35;
 	// var cy_height = cy_radius * Math.PI * 2;
-	pb = new TextureSphere(cy_radius, 100, 100, material);
+	pb = new TextureSphere(cy_radius, 200, 200, material);
 
 	return pb;	
 }

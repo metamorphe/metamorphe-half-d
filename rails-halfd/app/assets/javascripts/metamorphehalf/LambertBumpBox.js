@@ -96,9 +96,12 @@ LambertBumpBox.getDepthMap = function(texture, obj, fn, box){
 
 
 function extractDepthMap(wp){
-	console.log("Extracting");
-	var height = wp.pixels.height;
+
 	var width = wp.pixels.width;
+	var height = wp.pixels.height;	
+
+	console.log("Extracting", width, height);
+	
 	var pixels = wp.pixels;
 	var faces = wp.faces;
 	var faceVertexUvs = wp.faceVertexUvs;

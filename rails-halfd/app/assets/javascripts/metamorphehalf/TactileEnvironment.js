@@ -56,6 +56,7 @@ TactileEnvironment.configureGUI = function(tc){
 
 function workPackage(texture, geom){
 	this.pixels = Filters.filterImage(Filters.grayscale, texture.image);
+	
 	this.faces = geom.faces;
 	this.faceVertexUvs = geom.faceVertexUvs;
 }

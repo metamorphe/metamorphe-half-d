@@ -6,13 +6,19 @@ Filters.getPixels = function(img){
 	var c = this.getCanvas(img.width, img.height);
 	var ctx = c.getContext('2d');
 	
-	ctx.drawImage(img, 0, 0, c.width, c.height);
+	ctx.drawImage(img, 0, 0, c.width/3, c.height);
+	ctx.drawImage(img, c.width/3, 0, c.width/3, c.height);
+	ctx.drawImage(img, c.width/3 * 2, 0, c.width/3, c.height);
+	console.log("filter", c.width, c.height)
+	// ctx.drawImage(img, 0, 0, c.width, c.height/2);
+	// return ctx.getImageData(0, 0, c.width, c.height);	
 	return ctx.getImageData(0, 0, c.width, c.height);	
 };
 
 Filters.getCanvas = function(w, h){
-	var c = document.createElement('canvas');
-	c.width = w;
+	// var c = document.createElement('canvas');
+	var c = $("canvas#texture-render")[0];
+	c.width = w * 3;
 	c.height = h;
 	return c;
 }

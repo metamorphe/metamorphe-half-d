@@ -12,7 +12,16 @@ BumpBox.make = function(h, w, d, resolution, material){
 	var h_segments = parseInt(h/seg_size);
 
 	// pb = new PlaneBox(h, w, d, h_segments, w_segments, 1, material);
-	pb = new TextureCylinder(35, 70, 100, 100, false, material);
+	// Height = circumference
+	var cy_height = 70;
+	var cy_radius = cy_height / (2 * Math.PI) * 3;
+
+	// var cy_height = 35;
+
+	// var cy_radius = 35;
+	// var cy_height = cy_radius * Math.PI * 2;
+	pb = new TextureCylinder(cy_radius, cy_height, 200, 200, false, material);
+
 	return pb;	
 }
 

@@ -12,9 +12,9 @@
 //
 //= require jquery
 //= require jquery_ujs
-//= require turbolinks
 //= require bootstrap
-// require_tree .
+// require turbolinks
+// require_self
 
 
 function GET() {
@@ -31,5 +31,21 @@ function transformToAssocArray( prmstr ) {
     }
     return params;
 }
+
+
+function DOM(){}
+DOM.tag = function(tag, single){
+	if(single) return $("<" + tag + "/>");
+	else if(typeof single === "undefined") return $("<" + tag + ">" + "</" + tag + ">")
+	else return $("<" + tag + ">" + "</" + tag + ">")
+}
+
+Object.size = function(obj) {
+    var size = 0, key;
+    for (key in obj) {
+        if (obj.hasOwnProperty(key)) size++;
+    }
+    return size;
+};
 
 // var params = getSearchParameters();

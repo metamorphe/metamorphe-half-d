@@ -1,0 +1,11 @@
+<h3>Swatch Library</h3>
+
+
+<div class="row">
+   <% @swatches.reverse.each do |swatch| %>
+      <%= render :partial => "node", :locals => {:swatch => swatch} %>
+    <% end %>
+</div>
+
+<br>
+<%= link_to 'New Swatch', new_swatch_path %>

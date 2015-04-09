@@ -1,5 +1,18 @@
 Rails.application.routes.draw do
 
+  get 'paperscraps/generate'
+
+  devise_for :users
+  resources :user, :only => ["show"]
+
+  # resources :feel_swatches
+
+  resources :swatches do
+    member do
+      get 'threed'
+    end
+  end
+
   get 'threejs/height_displacement', :as => "pic2stl"
   get 'threejs/environment', :as => "three_env"
   get 'threejs/plane_box', :as => "plane_box"

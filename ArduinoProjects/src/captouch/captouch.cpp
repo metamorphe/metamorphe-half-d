@@ -17,6 +17,7 @@ BSD license, all text above must be included in any redistribution
 
 #include <Wire.h>
 #include <Adafruit_MPR121.h>
+#include "BlinkM.h"
 
 // You can have up to 4 on one i2c bus but one is enough for testing!
 Adafruit_MPR121 cap = Adafruit_MPR121(1, 1);
@@ -25,16 +26,22 @@ Adafruit_MPR121 cap = Adafruit_MPR121(1, 1);
 // so we know when buttons are 'released'
 uint16_t lasttouched = 0;
 uint16_t currtouched = 0;
+uint8_t BLINK_addr = 0;
 
 void cap_setup() {
   while (!Serial);        // needed to keep leonardo/micro from starting too fast!
   // Default address is 0x5A, if tied to 3.3V its 0x5B
   // If tied to SDA its 0x5C and if SCL then 0x5D
-  if (!cap.begin(0x5A)) {
+  if (!cap.begin(0x5D)) {
     Serial.println("MPR121 not found, check wiring?");
     while (1);
   }
   Serial.println("MPR121 found!");
+  BlinkM_begin();
+  BLINK_addr = BlinkM_findFirstI2CDevice();
+
+  if (BLINK_addr == 0)
+    Serial.print("BLINKM NOT FOUND");
 }
 
 void cap_routine() {
@@ -130,6 +137,22 @@ bool cap_enabled = false;
 uint8_t press = 255;
 uint8_t release = 255;
 
+void runIfOff(uint8_t addrB) {
+  //BlinkM_playScript(BLINK_addr, byte script_id, byte reps, byte pos);
+   //0x01, 0x00, 0x00, 0x08, 0x00 
+  BlinkM_playScript(addrB, 0x08, 0x00, 0x00);
+}
+
+void runIfPressed(uint8_t addrB) {
+  //BlinkM_playScript(BLINK_addr, byte script_id, byte reps, byte pos);
+  BlinkM_playScript(addrB, 0x03, 0x00, 0x00);
+}
+
+void runIfNear(uint8_t addrB) {
+  //BlinkM_playScript(BLINK_addr, byte script_id, byte reps, byte pos);
+  BlinkM_playScript(addrB, 0x06, 0x00, 0x00);
+}
+
 void loop(){ 
   //read the serial port and create a string out of what you read
   
@@ -140,7 +163,30 @@ void loop(){
 
     if ( cmd == 'e' ) {
     	cap_enabled = !cap_enabled;
-	    if(cap_enabled) Serial.println("cap enabled");
+	    if(cap_enabled) {
+
+        //cap.filteredData(i) for i = 2
+        Serial.println("cap enabled");
+        /**
+        if ( cap.filteredData(2) > 700 && cap.filteredData(2) < 800)
+        {
+            runIfOff(BLINK_addr);
+            Serial.println("NOT CLOSE");
+        }
+
+        if (cap.filteredData(2) > 400 && cap.filteredData(2) < 700)
+        {
+            runIfNear(BLINK_addr);
+            Serial.println("SOMEWHAT CLOSE");
+        }
+
+        if (cap.filteredData(2) < 400)
+        {
+            runIfPressed(BLINK_addr);
+            Serial.println("BEING PRESSED");
+        }
+        **/
+      }
 	  	else Serial.println("cap disabled");
     }
     else if( cmd == 'a' ) {
@@ -182,7 +228,7 @@ void loop(){
       // cap.stop();
       // Serial.println("MPR121 stopped");
     	cap = Adafruit_MPR121(press, release);
-    	 if (!cap.begin(0x5A)) {
+    	 if (!cap.begin(0x5D)) {
           Serial.println("MPR121 not found, check wiring?");
           while (1);
         }
@@ -196,12 +242,28 @@ void loop(){
       Serial.println(" received, but not understood.");
     }
   }
-  if(cap_enabled) cap_routine();
+  if(cap_enabled) 
+  {
+    cap_routine();
+    if ( cap.filteredData(2) > 730 && cap.filteredData(2) <= 800)
+        {
+            runIfOff(BLINK_addr);
+            Serial.println("NOT CLOSE");
+        }
 
+        if (cap.filteredData(2) > 700 && cap.filteredData(2) <= 730)
+        {
+            runIfNear(BLINK_addr);
+            Serial.println("BEING TOUCHED");
+        }
+
+        if (cap.filteredData(2) <= 700)
+        {
+            runIfPressed(BLINK_addr);
+            Serial.println("BEING PRESSED");
+        }
+  }
 }
-
-
-
 
 uint8_t readSerialString (void)
 {

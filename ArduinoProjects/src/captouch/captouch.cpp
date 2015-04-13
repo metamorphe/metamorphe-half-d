@@ -40,6 +40,10 @@ void cap_setup() {
   BlinkM_begin();
   BLINK_addr = BlinkM_findFirstI2CDevice();
 
+  pinMode(3, OUTPUT);  
+  pinMode(4, OUTPUT);  
+  pinMode(5, OUTPUT);  
+
   if (BLINK_addr == 0)
     Serial.print("BLINKM NOT FOUND");
 }
@@ -69,13 +73,18 @@ void cap_routine() {
   Serial.print("\t\t\t\t\t\t\t\t\t\t\t\t\t 0x"); Serial.print(cap.touched(), HEX);
   Serial.print(" Filt: ");
   uint8_t i = 2; 
-  // for (uint8_t i=0; i<12; i++) {
+   for (uint8_t i=2; i<6; i++) {
+    Serial.print("i: ");
+    Serial.print(i);
+    Serial.print("\t");
     Serial.print(cap.filteredData(i)); Serial.print("\t");
+  }
   // }
   // Serial.println();
-  Serial.print(" Base: ");
-  // for (uint8_t i=0; i<12; i++) {
-    Serial.print(cap.baselineData(i)); Serial.print("\t");
+  //Serial.print(" Base: ");
+  // for (uint8_t i=2; i<6; i++) {
+  //   Serial.print(cap.baselineData(i)); Serial.print("\t");
+  // }
   // }
   // Serial.println();
   
@@ -150,7 +159,37 @@ void runIfPressed(uint8_t addrB) {
 
 void runIfNear(uint8_t addrB) {
   //BlinkM_playScript(BLINK_addr, byte script_id, byte reps, byte pos);
+  //Find yellow
   BlinkM_playScript(addrB, 0x06, 0x00, 0x00);
+}
+
+//OFF RED
+void turnOff(uint8_t addrB) {
+    BlinkM_playScript(addrB, 0x03, 0x00, 0x00);
+    digitalWrite(3, LOW);
+    digitalWrite(4, LOW);
+    digitalWrite(5, LOW);
+}
+
+void runLow(uint8_t addrB)  {
+    BlinkM_playScript(addrB, 0x06, 0x00, 0x00);
+    digitalWrite(3, LOW);
+    digitalWrite(4, LOW);
+    digitalWrite(5, HIGH);
+}
+
+void runMedium(uint8_t addrB) {
+    BlinkM_playScript(addrB, 0x08, 0x00, 0x00);
+    digitalWrite(3, HIGH);
+    digitalWrite(4, LOW);
+    digitalWrite(5, LOW);
+}
+
+void runHigh(uint8_t addrB) {
+    BlinkM_playScript(addrB, 0x07, 0x00, 0x00);
+    digitalWrite(3, LOW);
+    digitalWrite(4, HIGH);
+    digitalWrite(5, LOW);
 }
 
 void loop(){ 
@@ -213,12 +252,18 @@ void loop(){
       Serial.print("Switching to touch mode");
       cap.stop();
       cap.set_baselineData(2, 0xB8);
+      cap.set_baselineData(3, 0xB8);
+      cap.set_baselineData(4, 0xB8);
+      cap.set_baselineData(5, 0xB8);
       cap.resume();
     }
     else if(cmd == 'p'){
       Serial.print("Switching to press mode");
       cap.stop();
       cap.set_baselineData(2, 0xB7);
+      cap.set_baselineData(3, 0xB7);
+      cap.set_baselineData(4, 0xB7);
+      cap.set_baselineData(5, 0xB7);
       cap.resume();
     }
     else if(cmd =='u'){
@@ -245,23 +290,66 @@ void loop(){
   if(cap_enabled) 
   {
     cap_routine();
-    if ( cap.filteredData(2) > 730 && cap.filteredData(2) <= 800)
+
+    /**
+    if ( cap.filteredData(2) > 702 && cap.filteredData(2) <= 800)
         {
             runIfOff(BLINK_addr);
-            Serial.println("NOT CLOSE");
+            Serial.println("2 NOT CLOSE");
         }
 
-        if (cap.filteredData(2) > 700 && cap.filteredData(2) <= 730)
+        if (cap.filteredData(2) > 700 && cap.filteredData(2) <= 702)
         {
             runIfNear(BLINK_addr);
-            Serial.println("BEING TOUCHED");
+            Serial.println("2 BEING TOUCHED");
+        }
+        */
+
+        if (cap.filteredData(2) <= 650)
+        {
+            turnOff(BLINK_addr);
+            Serial.print("\t");
+            Serial.print("SHOULD BE OFF ");
         }
 
-        if (cap.filteredData(2) <= 700)
+        /**
+    if ( cap.filteredData(3) > 702 && cap.filteredData(3) <= 800)
         {
-            runIfPressed(BLINK_addr);
-            Serial.println("BEING PRESSED");
+            runIfOff(BLINK_addr);
+            Serial.println("3 NOT CLOSE");
         }
+
+        if (cap.filteredData(3) > 700 && cap.filteredData(3) <= 702)
+        {
+            runIfNear(BLINK_addr);
+            Serial.println("3 BEING TOUCHED");
+        }
+        */ 
+
+        if (cap.filteredData(3) < 670)
+        {
+            runLow(BLINK_addr);
+            Serial.print("\t");
+            Serial.print("RUNNING LOW");
+        }
+
+         if (cap.filteredData(4) <= 700)
+        {
+            runHigh(BLINK_addr);
+            Serial.print("\t");
+            Serial.print("RUNNING HIGH ");
+        }       
+
+         if (cap.filteredData(5) < 690)
+        {
+            runMedium(BLINK_addr);
+            Serial.print("\t");
+            Serial.print("RUNNING MEDIUM ");
+        } 
+
+        // else {
+        //   turnOff(BLINK_addr);
+        // }
   }
 }
 

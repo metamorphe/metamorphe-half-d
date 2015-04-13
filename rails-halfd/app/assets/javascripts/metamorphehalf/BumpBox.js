@@ -13,8 +13,8 @@ BumpBox.make = function(h, w, d, resolution, material){
 
 	// pb = new PlaneBox(h, w, d, h_segments, w_segments, 1, material);
 	// Height = circumference
-	var cy_height = 20;
-	var cy_radius = 20;
+	var cy_height = 35;
+	var cy_radius = 45;
 	// cy_height / (2 * Math.PI) * 3;
 
 	// var cy_height = 35;

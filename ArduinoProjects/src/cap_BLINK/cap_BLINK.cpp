@@ -72,13 +72,13 @@ void cap_routine() {
   // debugging info, what
   Serial.print("\t\t\t\t\t\t\t\t\t\t\t\t\t 0x"); Serial.print(cap.touched(), HEX);
   Serial.print(" Filt: ");
-  uint8_t i = 2; 
-   for (uint8_t i=2; i<6; i++) {
+  uint8_t i = 6; 
+   //for (uint8_t i=2; i<6; i++) {
     Serial.print("i: ");
     Serial.print(i);
     Serial.print("\t");
     Serial.print(cap.filteredData(i)); Serial.print("\t");
-  }
+  //}
   // }
   // Serial.println();
   //Serial.print(" Base: ");
@@ -149,18 +149,22 @@ uint8_t release = 255;
 void runIfOff(uint8_t addrB) {
   //BlinkM_playScript(BLINK_addr, byte script_id, byte reps, byte pos);
    //0x01, 0x00, 0x00, 0x08, 0x00 
-  BlinkM_playScript(addrB, 0x08, 0x00, 0x00);
+  //BlinkM_playScript(addrB, 0x08, 0x00, 0x00);
+
+  BlinkM_fadeToRGB(addrB, 0x00, 0xff, 0x00);
 }
 
 void runIfPressed(uint8_t addrB) {
   //BlinkM_playScript(BLINK_addr, byte script_id, byte reps, byte pos);
-  BlinkM_playScript(addrB, 0x03, 0x00, 0x00);
+  //BlinkM_playScript(addrB, 0x03, 0x00, 0x00);
+  BlinkM_fadeToRGB(addrB, 0xff, 0x00, 0x00);
 }
 
 void runIfNear(uint8_t addrB) {
   //BlinkM_playScript(BLINK_addr, byte script_id, byte reps, byte pos);
   //Find yellow
-  BlinkM_playScript(addrB, 0x06, 0x00, 0x00);
+  //BlinkM_playScript(addrB, 0x06, 0x00, 0x00);
+  BlinkM_fadeToRGB(addrB, 0xff, 0xff, 0x00);
 }
 
 //OFF RED
@@ -255,6 +259,7 @@ void loop(){
       cap.set_baselineData(3, 0xB8);
       cap.set_baselineData(4, 0xB8);
       cap.set_baselineData(5, 0xB8);
+      cap.set_baselineData(6, 0xB8);
       cap.resume();
     }
     else if(cmd == 'p'){
@@ -264,6 +269,7 @@ void loop(){
       cap.set_baselineData(3, 0xB7);
       cap.set_baselineData(4, 0xB7);
       cap.set_baselineData(5, 0xB7);
+      cap.set_baselineData(6, 0xB7);
       cap.resume();
     }
     else if(cmd =='u'){
@@ -305,11 +311,25 @@ void loop(){
         }
         */
 
-        if (cap.filteredData(2) <= 650)
+        if (cap.filteredData(6) > 730)
         {
-            turnOff(BLINK_addr);
+            runIfOff(BLINK_addr);
             Serial.print("\t");
-            Serial.print("SHOULD BE OFF ");
+            Serial.print("SHOULD BE OFF - GREEN ");
+        }
+
+        if (cap.filteredData(6) > 700 && cap.filteredData(6) <= 730)
+        {
+            runIfNear(BLINK_addr);
+            Serial.print("\t");
+            Serial.print("SHOULD BE NEAR - YELLOW ");
+        }
+
+        if (cap.filteredData(6) <= 700)
+        {
+            runIfPressed(BLINK_addr);
+            Serial.print("\t");
+            Serial.print("SHOULD BE PRESSED - RED ");
         }
 
         /**
@@ -326,27 +346,7 @@ void loop(){
         }
         */ 
 
-        if (cap.filteredData(3) < 670)
-        {
-            runLow(BLINK_addr);
-            Serial.print("\t");
-            Serial.print("RUNNING LOW");
-        }
-
-         if (cap.filteredData(4) <= 700)
-        {
-            runHigh(BLINK_addr);
-            Serial.print("\t");
-            Serial.print("RUNNING HIGH ");
-        }       
-
-         if (cap.filteredData(5) < 690)
-        {
-            runMedium(BLINK_addr);
-            Serial.print("\t");
-            Serial.print("RUNNING MEDIUM ");
-        } 
-
+        
         // else {
         //   turnOff(BLINK_addr);
         // }

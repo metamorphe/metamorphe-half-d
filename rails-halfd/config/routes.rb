@@ -1,5 +1,7 @@
 Rails.application.routes.draw do
 
+  get 'internal/tool'
+
   get 'paperscraps/generate'
 
   devise_for :users

@@ -134,7 +134,7 @@ function uv2xy(uv, w, h){
 	}
 
 	var x = (h - 1) - Math.floor(u * 1.0 * h);
-	var y = (w - 1) - Math.floor(v * 1.0 * w);
+	var y = Math.floor(v * 1.0 * w);
 
 	var row = x * (w * 4); 
 	var col = y * 4;

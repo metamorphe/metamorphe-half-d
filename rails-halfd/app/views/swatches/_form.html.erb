@@ -33,19 +33,19 @@
   </div>
   <div class="field">
     <%= f.label :base_height %><br>
-    <%= f.text_field :base_height, value: "2.0" %>
+    <%= f.text_field :base_height, value: @swatch.base_height or 2.0 %>
   </div>
   <div class="field">
     <%= f.label :displacement %><br>
-    <%= f.text_field :displacement, value: "2.0" %>
+    <%= f.text_field :displacement, value: @swatch.displacement or 2.0 %>
   </div>
   <div class="field">
     <%= f.label :height.to_s + " (mm)" %><br>
-    <%= f.text_field :height, value: "70.0" %>
+    <%= f.text_field :height, value: @swatch.height or 70 %>
   </div>
   <div class="field">
     <%= f.label :width.to_s + " (mm)" %><br>
-    <%= f.text_field :width, value: "70.0" %>
+    <%= f.text_field :width, value: @swatch.width or 70 %>
   </div>
   <div class="field">
     <%= f.label :depth.to_s + " (mm)" %><br>

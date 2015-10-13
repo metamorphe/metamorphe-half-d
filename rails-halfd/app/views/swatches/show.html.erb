@@ -85,12 +85,12 @@
   <% end %>
    <%=link_to threed_swatch_path(@swatch, 
               {
-                :engine => "bump",
                 :texture => @swatch.bump_map_identifier.split(".")[0], 
                 :h => @swatch.width,
                 :w => @swatch.height,
-                :b => @swatch.base_height,
-                :mag => @swatch.displacement,
+                :bh => @swatch.base_height,
+                :m => @swatch.displacement,
+                :engine => "bump"
               }), 
                 :class => "btn btn-default", 
                 :title => "View 3D" do %>

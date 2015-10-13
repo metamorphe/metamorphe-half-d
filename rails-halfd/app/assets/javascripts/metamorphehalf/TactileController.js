@@ -2,14 +2,14 @@ function TactileController(){
 	this.texture = GET().texture || "corn";
 	this.engine = GET().engine || "shade";
 	this.current_model;
-	this.magnitude = parseFloat(GET()).mag || 2.8;
 	this.loaded = {};
 	this.env = new WebEnv($("#ThreeJS"));
 	this.preview;
-	this.base_height = parseFloat(GET().b) || 0.2;
+	this.magnitude = parseFloat(GET().m) || 5;
+	this.base_height = parseFloat(GET().bh) || 2;
 	this.width = parseFloat(GET().w) || 70;
 	this.height = parseFloat(GET().h) || 70;
-	this.resolution = parseFloat(GET().r) || 300;
+	this.resolution = parseFloat(GET().r) || 200;
 }
 
 

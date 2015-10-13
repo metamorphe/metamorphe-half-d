@@ -16,10 +16,28 @@ $(function(){
 });
 
 function generateURL(){
+	m = {
+		texture: "texture", 
+		h: "height", 
+		w: "width",
+		bh: "base_height", 
+		m : "magnitude",
+		engine: "engine"
+	}
+	href = "threed?"; 
+	var i = 0;
+	for(var k in m){
+		if(i == Object.size(m) - 1)
+			href += k + "=" + tc[m[k]];
+		else
+			href += k + "=" + tc[m[k]] + "&";
+		i++;
+	}
+	console.log(href);
 	return {
 		title: tc.texture + " rendered as " + tc.engine,
-		href: "threed?engine=" + tc.engine +"&" + "texture=" + tc.texture + "&" + "h=" + tc.height + "&" + "w=" + tc.width + "&" + "bh=" + tc.base_height
-		}
+		href: href
+	}
 }
 </script>
 

@@ -10,6 +10,7 @@ function TactileController(){
 	this.width = parseFloat(GET().w) || 70;
 	this.height = parseFloat(GET().h) || 70;
 	this.resolution = parseFloat(GET().r) || 200;
+	console.log("BH", this.base_height);
 }
 
 

@@ -34,8 +34,8 @@ TactileEnvironment.configureGUI = function(tc){
 	var engineController = gui.add(tc, 'engine', ["shade", "bump"]);
 	engineController.onChange(function(){ tc.switch(); });
 
-	var magnitudeController = gui.add(tc, 'magnitude', 0, 10);
-	var bhController = gui.add(tc, 'base_height', 0.01, 10);
+	var magnitudeController = gui.add(tc, 'magnitude', 0, 100);
+	var bhController = gui.add(tc, 'base_height', 0.01, 100);
 	magnitudeController.onChange(function(){ tc.mag(); });
 
 	bhController.onFinishChange(function(){

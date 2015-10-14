@@ -43,13 +43,13 @@
       <%= @swatch.name %> 
     </h2>
     <p> <em> author </em> <%= link_to @swatch.user.email, user_path(@swatch.user)%></p>
-    <p>
+  <!--   <p>
       <% if @swatch.is_dynamic %>
       <%= glyph("check") %> Dynamic
       <% else %>
       <%= glyph("remove") %> Dynamic
       <% end %> 
-    </p>
+    </p> -->
   </div>
   <div class="col-xs-6">
     <div class="img-wrapper">

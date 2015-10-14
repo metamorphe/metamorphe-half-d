@@ -1,5 +1,13 @@
-<h1>New swatch</h1>
+<div class="col-xs-1">
+	<h2><%= link_to  swatches_path, :class =>"btn btn-default" do %>
+			<span class="glyphicon glyphicon-chevron-left"></span>
+			Back
+		<% end %>
+	</h2>
+</div>
+ <div class="col-xs-6">
+	 	<h2>New swatch</h2>
+		<%= render 'form' %>
 
-<%= render 'form' %>
-
-<%= link_to 'Back', swatches_path %>
+		
+</div>

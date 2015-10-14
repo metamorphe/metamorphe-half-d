@@ -23,7 +23,7 @@
 }
 .library-block{
 	/*margin: 10px 10px;*/
-	height: 200px;
+	height: 210px;
 	margin: 0 0;
 	padding: 0 4px;
 	width: 100%;
@@ -32,6 +32,7 @@
 	overflow: hidden;
 	border: 1px solid #E6E6E6;
 	position: relative;
+	margin-bottom: 8px;
 }
 .library-block:hover{
 	background: white;
@@ -60,7 +61,7 @@ div.library-block-wrapper{
 	background: #F5F5F5;
 	border-radius: 5px;
 	padding: 10px; 
-	min-height: 200px;
+	min-height: 220px;
 	position: relative;
 }
 .library-block h2{
@@ -76,6 +77,7 @@ div.img-wrapper{
 	height: 150px;
 	width: 100%;
 	text-align: center;
+	margin-bottom: 5px;
 }
 div.img-wrapper-large{
 	height: 250px;

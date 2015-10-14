@@ -22,11 +22,11 @@
 					<% end %>
 					<%=link_to threed_swatch_path(swatch, 
 		              {
-		                :texture => @swatch.bump_map_identifier.split(".")[0], 
-		                :h => @swatch.width,
-		                :w => @swatch.height,
-		                :bh => @swatch.base_height,
-		                :m => @swatch.displacement,
+		                :texture => swatch.bump_map_identifier.split(".")[0], 
+		                :h => swatch.width,
+		                :w => swatch.height,
+		                :bh => swatch.base_height,
+		                :m => swatch.displacement,
 		                :engine => "bump"
 		              }), 
 		                :class => "btn btn-default btn-xs pull-right", 

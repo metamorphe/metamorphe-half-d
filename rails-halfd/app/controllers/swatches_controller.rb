@@ -1,5 +1,5 @@
 class SwatchesController < ApplicationController
-  before_filter :authenticate_user!, only: [:edit, :update, :destroy]
+  before_filter :authenticate_user!, only: [:index, :show, :edit, :update, :destroy]
   before_action :set_swatch, only: [:threed, :show, :edit, :update, :destroy]
 
   # GET /swatches

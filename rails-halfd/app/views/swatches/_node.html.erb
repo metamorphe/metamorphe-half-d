@@ -20,20 +20,19 @@
 								:title => "Download STL" do %>
 									<%= glyph("download") %>
 					<% end %>
-				
 					<%=link_to threed_swatch_path(swatch, 
-							{
-								:texture => swatch.bump_map_identifier.split(".")[0], 
-								:engine => "shade",
-								:h => swatch.height,
-								:w => swatch.width,
-								:b => swatch.base_height,
-								:mag => swatch.displacement,
-								:engine => "shade"
-							}), 
-								:class => "btn btn-default btn-xs pull-right", 
-								:title => "View 3D" do %>
-									<%= glyph("eye-open") %> 
+		              {
+		                :texture => @swatch.bump_map_identifier.split(".")[0], 
+		                :h => @swatch.width,
+		                :w => @swatch.height,
+		                :bh => @swatch.base_height,
+		                :m => @swatch.displacement,
+		                :engine => "bump"
+		              }), 
+		                :class => "btn btn-default btn-xs pull-right", 
+		                :title => "View 3D" do %>
+		                  <%= glyph("eye-open") %> 
+				
 					<% end %>
 				</div>
 		</div>

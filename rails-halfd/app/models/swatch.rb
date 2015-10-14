@@ -22,7 +22,7 @@ class Swatch < ActiveRecord::Base
 	belongs_to :user
 	belongs_to :layer
 
-	validates :name, :bump_map, :base_height, :displacement, :height, :width, :depth, :thumbnail, :user_id, :layer_id, :presence => true
+	validates :name, :bump_map, :base_height, :displacement, :height, :width, :thumbnail, :user_id, :layer_id, :presence => true
 	validates :name, :uniqueness => true 
 end
 

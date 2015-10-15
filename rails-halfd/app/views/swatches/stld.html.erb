@@ -1,0 +1,44 @@
+
+<%= stylesheet_link_tag 'threejs'%>
+<%= javascript_include_tag 'threejs' %>
+<%= javascript_include_tag 'metamorphehalf/planebox' %>
+<%= javascript_include_tag 'metamorphehalf/DimensionsPreview' %>
+
+
+<script type="text/javascript">
+var swatch = <%= @swatch %>;
+var gui, hp, env, dim, storage, alert;
+
+$(function(){
+	env = new WebEnv($("#ThreeJS"));
+	dim = new DimensionsPreview($("#ThreeJS"));
+	alert = new UIAlert($("#ThreeJS"));
+
+	storage = new WebStorage();
+	hp = new HapticPrint(swatch.stl.url, swatch.bump_map.url, swatch.displacement);
+	setupGUI();
+	$(window).resize();
+});
+
+function setupGUI(){
+	var gui = new dat.GUI();
+
+	var magnitudeController = gui.add(hp, 'magnitude', 0, 4);
+	magnitudeController.onChange(function(){
+		console.log("Mag changed");
+		hp.mag();
+	});
+
+	var exporter = gui.add(hp, 'save');
+}
+</script>
+
+<style type="text/css">
+	#texture-render{
+		display: none;
+	}
+</style>
+<div class="threejs_container">
+<div id="ThreeJS" ></div>
+</div>
+<canvas id="texture-render" ></canvas>

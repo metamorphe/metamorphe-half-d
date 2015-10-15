@@ -1,6 +1,6 @@
 class SwatchesController < ApplicationController
   before_filter :authenticate_user!, only: [:index, :show, :edit, :update, :destroy]
-  before_action :set_swatch, only: [:threed, :show, :edit, :update, :destroy]
+  before_action :set_swatch, only: [:threed, :show, :edit, :update, :destroy, :stld]
 
   # GET /swatches
   # GET /swatches.json
@@ -13,7 +13,13 @@ class SwatchesController < ApplicationController
   def show
   end
 
-  def threed  
+  def stld  
+    @files = [@swatch.bump_map_url].to_json.html_safe
+    @swatch = @swatch.to_json.html_safe
+    render :layout => "full_screen" 
+  end
+
+   def threed  
     @files = [@swatch.bump_map_url].to_json.html_safe
     render :layout => "full_screen" 
   end

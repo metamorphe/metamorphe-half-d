@@ -17,3 +17,6 @@
 
 .DS_Store
 /test/*
+/public/uploads
+/public/heightmap
+/public/stls

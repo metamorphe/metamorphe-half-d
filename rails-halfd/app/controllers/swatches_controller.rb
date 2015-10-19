@@ -14,6 +14,8 @@ class SwatchesController < ApplicationController
   end
 
   def stld  
+    
+    @swatchobj = @swatch
     @files = [@swatch.bump_map_url].to_json.html_safe
     @swatch = @swatch.to_json.html_safe
     render :layout => "full_screen" 

@@ -37,7 +37,17 @@ function setupGUI(){
 	#texture-render{
 		display: none;
 	}
+	#texture_preview{
+		z-index: 1000;
+		position: absolute;
+		top: 5px;
+		left: 5px;
+		height: 100px;
+		border: 1px gray solid;
+	}
 </style>
+
+<%= image_tag @swatchobj.bump_map.url, :id=>"texture_preview" %>
 <div class="threejs_container">
 <div id="ThreeJS" ></div>
 </div>

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>HapticPrint - <%= params[:action].humanize %></title>
+  <title>HapticPrint - <%= params[:action].humanize.upcase %></title>
   <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true %>
   <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
   <!-- <%=params[:controller]%> -->

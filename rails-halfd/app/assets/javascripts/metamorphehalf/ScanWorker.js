@@ -15,9 +15,9 @@
 	// depthWorker.postMessage({'wp': wp}); 
 
 	self.addEventListener('message', function(e) {
-	var data = e.data;
-	var wp = e.data.wp;
-	self.postMessage(extractDepthMap(wp));  
+		var data = e.data;
+		var wp = e.data.wp;
+		self.postMessage(extractDepthMap(wp));  
 	}, false);
 
 

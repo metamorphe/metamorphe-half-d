@@ -1,6 +1,7 @@
 # Place all the behaviors and hooks related to the matching controller here.
 # All this logic will automatically be available in application.js.
 # You can use CoffeeScript in this file: http://coffeescript.org/
+//= require underscore
 //= require three
 //= require Detector
 //= require Stats
@@ -24,6 +25,10 @@
 //= require metamorphehalf/TactileModel
 //= require metamorphehalf/TactileController
 //= require metamorphehalf/TactileEnvironment
+//= require metamorphehalf/TactileEnvironment
+//= require metamorphehalf/hapticprint
+//= require STLLoader
+//= require SubdivisionModifier
 
 //= require ui_alert
 

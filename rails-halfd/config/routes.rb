@@ -12,6 +12,7 @@ Rails.application.routes.draw do
   resources :swatches do
     member do
       get 'threed'
+      get 'stld'
     end
   end
 

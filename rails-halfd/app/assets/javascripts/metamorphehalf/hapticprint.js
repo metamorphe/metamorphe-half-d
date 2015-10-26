@@ -91,7 +91,7 @@ HapticPrint.prototype = {
 
 			// SMOOTH
 			var start = performance.now();
-			var modifier = new THREE.SubdivisionModifier(3);
+			var modifier = new THREE.SubdivisionModifier(1);
 			modifier.modify( geometry );
 			var end = performance.now();
 			var time = (end - start)/1000;
@@ -99,7 +99,7 @@ HapticPrint.prototype = {
 			// END SMOOTH
 
 
-			geometry = assignUVs(geometry);
+			geometry = assignUVsRevolve(geometry);
 			geometry.computeBoundingBox();
 
 			var dimensions = geometry.boundingBox.max.clone().sub(geometry.boundingBox.min);
@@ -116,7 +116,7 @@ HapticPrint.prototype = {
 				mesh.receiveShadow = true;
 			scope.stl = mesh;
 			scope.stl.geometry.original = clone_vec_array(scope.stl.geometry.vertices); //Keep the original geometry
-			// scope.stl.material.wireframe = true;
+			scope.stl.material.wireframe = false;
 			env.scene.add( mesh );
 			dim.set(dimensions.x, dimensions.y, dimensions.z);
 
@@ -129,7 +129,7 @@ HapticPrint.prototype = {
 					scope.texture.minFilter = THREE.LinearFilter;
 					// UPDATE THE PHYSICAL/CPU ENGINE
 					scope.depth_map = HapticPrint.getDepthMap(texture, scope.stl, scope);
-					scope.mag();
+					// scope.mag();
 				});
 		});
 	},
@@ -167,9 +167,7 @@ HapticPrint.adjustDepthMap = function(depthMap, magnitude){
 	return new_depth;
 }
 
-var min, max;
-
-assignUVs = function( geometry ){
+assignUVsRevolve = function( geometry ){
 
     geometry.computeBoundingBox();
 
@@ -246,6 +244,37 @@ assignUVs = function( geometry ){
     }
     
     // console.log("angs", angs);
+
+    geometry.uvsNeedUpdate = true;
+    return geometry;
+}
+
+assignUVsXY = function( geometry ){
+
+    geometry.computeBoundingBox();
+
+    var max     = geometry.boundingBox.max;
+    var min     = geometry.boundingBox.min;
+
+    var offset  = new THREE.Vector2(0 - min.x, 0 - min.y);
+    var range   = new THREE.Vector2(max.x - min.x, max.y - min.y);
+
+    geometry.faceVertexUvs[0] = [];
+    var faces = geometry.faces;
+
+    for (i = 0; i < geometry.faces.length ; i++) {
+
+      var v1 = geometry.vertices[faces[i].a];
+      var v2 = geometry.vertices[faces[i].b];
+      var v3 = geometry.vertices[faces[i].c];
+
+      geometry.faceVertexUvs[0].push([
+        new THREE.Vector2( ( v1.x + offset.x ) / range.x , ( v1.y + offset.y ) / range.y ),
+        new THREE.Vector2( ( v2.x + offset.x ) / range.x , ( v2.y + offset.y ) / range.y ),
+        new THREE.Vector2( ( v3.x + offset.x ) / range.x , ( v3.y + offset.y ) / range.y )
+      ]);
+
+    }
 
     geometry.uvsNeedUpdate = true;
     return geometry;

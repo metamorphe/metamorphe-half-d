@@ -95,6 +95,10 @@ WebEnv.prototype = {
       	 directionalLight.position.set(1, 1, 1).normalize();
       	this.scene.add(directionalLight);
 
+      	var directionalLight = new THREE.DirectionalLight(0xFFFFFF);
+      	 directionalLight.position.set(1, -1, 1).normalize();
+      	this.scene.add(directionalLight);
+
 		// SKYBOX
 		var skyBoxGeometry = new THREE.CubeGeometry( 200000, 200000, 100000 );
 		var skyBoxMaterial = new THREE.MeshBasicMaterial( { color: 0x9999ff, side: THREE.BackSide } );

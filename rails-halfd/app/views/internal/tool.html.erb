@@ -1,0 +1,261 @@
+<%= javascript_include_tag 'metamorphehalf/DimensionsPreview', 'data-turbolinks-track' => true %>
+<script type="text/javascript">
+var env;
+var dim;
+var lambertMaterial = new THREE.MeshPhongMaterial({
+						        specular: '#a9fcff',
+						        color: '#00abb1',
+						        ambient: new THREE.Color( 0xffffff ),
+						        // dark
+						        specular: new THREE.Color( 0x111111 ),
+						        emissive: new THREE.Color( 0x000000 ),
+						        side: THREE.DoubleSide,
+						        shininess: 30
+						      });
+var lambertRedMaterial = new THREE.MeshBasicMaterial({
+						        specular: '#a9fcff',
+						        color: '#ef3340',
+						        ambient: new THREE.Color( 0xffffff ),
+						        // dark
+						        specular: new THREE.Color( 0x111111 ),
+						        emissive: new THREE.Color( 0x000000 ),
+						        side: THREE.DoubleSide,
+						        // shininess: 30, 
+						       
+						      });
+var lambertMaterial2 = new THREE.MeshPhongMaterial({
+						        specular: '#a9fcff',
+						        color: '#00abb1',
+						        ambient: new THREE.Color( 0xffffff ),
+						        // dark
+						        specular: new THREE.Color( 0x111111 ),
+						        emissive: new THREE.Color( 0x000000 ),
+						        side: THREE.DoubleSide,
+						        shininess: 30, 
+						        wireframe: true
+						      });
+var stl, carpal, gui;
+var configs = <%= @configs.to_json.html_safe %>;
+var filepath = "<%= @filepath %>";
+
+$(function(){
+	
+	env = new WebEnv($("#ThreeJS"));
+	var loader = new THREE.STLLoader();
+
+	loader.load( filepath, function ( geometry ) {
+		geometry.computeBoundingBox();
+		var dimensions = geometry.boundingBox.max.clone().sub(geometry.boundingBox.min);
+		console.log(dimensions);
+
+
+		// centerMatrix = new THREE.Matrix4().makeTranslation(0, 0, 0);
+		centerMatrix = new THREE.Matrix4().makeTranslation(0, -dimensions.y/2, 0);
+		var mesh = new THREE.Mesh( geometry, lambertMaterial );
+		// // mesh.position = 
+
+
+		mesh.updateMatrix(); 
+		mesh.geometry.applyMatrix( centerMatrix );
+		mesh.matrix.identity();
+
+		mesh.geometry.verticesNeedUpdate = true;
+		mesh.rotation.x += Math.PI/4 * 6;
+
+		mesh.castShadow = true;
+		mesh.receiveShadow = true;
+		env.scene.add( mesh );
+		stl = mesh;
+		dim = new DimensionsPreview(env.container);
+		dim.set(dimensions.x, dimensions.y, dimensions.z);
+		carpal.setModel(stl);
+	} );
+
+	carpal = new Carpal(env, 0.10, 5);
+	gui = new dat.GUI();
+	var divisionsController = gui.add(carpal, "divisions");
+	var layerHeightController = gui.add(carpal, "layer_height");
+	var filamentController = gui.add(carpal, "filament_profile", configs);
+	var generateController = gui.add(carpal, "generate");
+	var filamentController = gui.add(carpal, "cure");
+});
+
+function Carpal(env, layer_height, divisions){
+	this.layer_height = layer_height;
+	this.divisions = divisions;
+	this.env = env;
+	this.filament_profile = ""; 
+}
+
+Carpal.prototype = {
+	cure: function(){
+		HapticPrintCura.curify(filepath, this.filament_profile, "haptics.csv");
+	},
+	generate: function(){
+
+		var planeWidth = this.getDimensions().x * 1.1;
+		var planeHeight = this.getDimensions().y * 1.1;
+		var planeGeo = new THREE.PlaneGeometry( planeWidth, planeHeight, 20, 20) ;
+		var mesh = new THREE.Mesh(planeGeo, lambertMaterial);
+
+
+		var meshHeight = this.getDimensions().z;
+		var start = this.model.geometry.boundingBox.min.z;
+		var end = this.model.geometry.boundingBox.max.z;
+		var step = meshHeight/this.divisions;
+
+		this.planes = [];
+		var ct; 
+		for(var i = start; i <= end; i+= step){
+			var plane = planeGeo.clone();
+			var mesh = new THREE.Mesh(planeGeo, lambertMaterial2);
+			mesh.position.z = i;
+			ct = new CarpalTunnel(this.planes.length, (i - start)/this.layer_height, mesh);
+			this.planes.push(ct);
+			ct.addToGUI(gui);
+			this.env.scene.add(mesh);
+		}
+		gui.add(this, "save");
+	},
+	getDimensions: function(){
+		if(typeof stl === "undefined") return;
+		this.model.geometry.computeBoundingBox();
+		var dimensions = this.model.geometry.boundingBox.max.clone().sub(this.model.geometry.boundingBox.min);
+		return dimensions;
+	},
+	setModel: function(stl){
+		this.model = stl;
+
+	},
+	toString: function(){
+		console.log("I am carpal with", layer_height, "mm height and", divisions, "divisions");
+
+	},
+	save: function(){
+		var data = $.map(this.planes, function(el, i){
+			return el.data();
+		}).join('\n');
+		// var json = JSON.stringify(data);
+		var blob = new Blob([data], {type: "txt/csv"});
+		var url  = URL.createObjectURL(blob);
+
+		// var a = document.createElement('a');
+		// a.download    = "backup.json";
+		// a.href        = url;
+		// a.textContent = "Download backup.json";
+		// $(a).click();
+
+
+    	// FileSaver.js defines `saveAs` for saving files out of the browser
+    	saveAs(blob, "carpal.csv");
+	}
+}
+
+
+function HapticPrintCura(){}
+
+HapticPrintCura.curify = function(stl, config, csv){
+	name = stl.split('.')[0];
+	name = name.split('/');
+	name = name[name.length - 1]
+	$.ajax({
+	   method: 'POST',
+	   url: '/internal/cure',
+	   data: {
+	      stl: stl, 
+	      config: config, 
+	      internals: csv, 
+	      name: name
+	   },
+	   error: function() {
+	      console.log("No bueno!")
+
+	   },
+	   dataType: "json",
+	   success: function(data) {
+	     console.log("Win!", data);
+
+	     
+	     	var link = $('<a download="hapticprint.gcode">Download</a>')
+		     	.attr('href', data.gcode)
+		     	.addClass('btn btn-primary btn-lg')
+		     	.html('GCODE')
+		     	.css({
+		     		position: 'absolute', 
+		     		top: 5, 
+		     		left: 5
+		     	});
+	     	$('body').append(link);
+	   }
+	});
+}
+
+
+
+
+
+function CarpalTunnel(id, layer, mesh){
+	this.id = id;
+	this.layer = layer;
+	this.mesh = mesh;
+	this.pattern = "INFILL_GRID";
+	this.density = 0.18;
+}
+CarpalTunnel.patterns = ["INFILL_AUTOMATIC",
+		"INFILL_GRID",
+		"INFILL_LINES",
+		"INFILL_CONCENTRIC",
+		"INFILL_DOUBLE_CONCENTRIC",
+		"INFILL_CHAMBERED", 
+		"INFILL_AXIS_CHAMBERED"];
+
+CarpalTunnel.prototype = {
+	addToGUI: function(gui){
+		this.folder = gui.addFolder("Chamber" + this.id);
+		this.zPosition = this.folder.add(this.mesh.position, "z", this.mesh.position.z -20, this.mesh.position.z + 20);
+		this.patternController = this.folder.add(this, "pattern", CarpalTunnel.patterns);
+		this.densityController = this.folder.add(this, "density", 0, 1).step(0.01);
+	}, 
+	data: function(){
+		var idx = CarpalTunnel.patterns.indexOf(this.pattern);		
+		if(idx == -1)
+			console.log("Pattern not found");
+
+		var pattern_id = idx;
+
+
+		var temp = [this.id, this.layer, pattern_id, this.density];
+		return temp.join(",");
+		// return {id: this.id, layer: this.layer, pattern: this.pattern, density: this.density};
+	}
+}
+
+
+
+
+$(window).resize(function(){
+	console.log("Resized!");
+	THREEx.WindowResize(env.renderer, env.camera);
+});
+
+
+function addStats(container){
+	// STATS
+	var stats = new Stats();
+	stats.domElement.style.position = 'relative';
+	stats.domElement.style.top = '-55px';
+	stats.domElement.style.left = '0px';
+	stats.domElement.style.zIndex = 100;
+	container.appendChild( stats.domElement );
+	return stats;
+}
+</script>
+
+<style type="text/css">
+	#texture-render{
+		display: none;
+	}
+</style>
+<div class="threejs_container">
+<div id="ThreeJS" ></div>
+</div>

@@ -62,7 +62,7 @@ int main(int argc, char **argv)
     ConfigSettings config;
     fffProcessor processor(config);
     std::vector<std::string> files;
-
+    char* outfile = "";
     cura::log("Cura_SteamEngine version %s\n", VERSION);
     cura::log("Copyright (C) 2014 David Braam\n");
     cura::log("\n");
@@ -120,6 +120,7 @@ int main(int argc, char **argv)
                         cura::logError("Failed to open %s for output.\n", argv[argn]);
                         exit(1);
                     }
+                    outfile = argv[argn];
                     break;
                 case 'c':
                     {
@@ -198,5 +199,6 @@ int main(int argc, char **argv)
     }
     //Finalize the processor, this adds the end.gcode. And reports statistics.
     processor.finalize();
+    printf("%s", outfile);
     return 0;
 }

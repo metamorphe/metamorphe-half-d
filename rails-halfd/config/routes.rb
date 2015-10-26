@@ -1,6 +1,8 @@
 Rails.application.routes.draw do
 
   get 'internal/tool'
+  get 'internal/cure'
+  post 'internal/cure'
 
   get 'paperscraps/generate'
 

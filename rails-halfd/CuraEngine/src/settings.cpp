@@ -238,7 +238,7 @@ bool ConfigSettings::readSettings(void) {
 }
 
 bool ConfigSettings::readSettings(const char* path) {
-    cura::log("Reading settings...\n");
+    cura::log("Reading settings... %s\n", path);
     std::ifstream config(path);
     std::string line;
     size_t line_number = 0;

@@ -684,7 +684,7 @@ private:
             // HALFD CODE
             // float fillDensity = 100 * 1000 * extrusionWidth / config.sparseInfillLineDistance; 
             float fillDensity = 100 * extrusionWidth / forceSparseInfillLineDistance;
-            printf("Layer %d, Infill pattern #%d, Fill Angle: %2.2f, Density: %2.2f FillDistance: %d, extrusionWidth: %2.2d\n",  layerNr, forceFillPattern, fillAngle, fillDensity, forceSparseInfillLineDistance, extrusionWidth);
+            cura::log("Layer %d, Infill pattern #%d, Fill Angle: %2.2f, Density: %2.2f FillDistance: %d, extrusionWidth: %2.2d\n",  layerNr, forceFillPattern, fillAngle, fillDensity, forceSparseInfillLineDistance, extrusionWidth);
             Polygons outline; 
             
             if (forceSparseInfillLineDistance > 0)

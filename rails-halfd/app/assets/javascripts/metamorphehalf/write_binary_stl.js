@@ -94,5 +94,6 @@ var AsciiStlWriter = (function() {
   }
   
   that.save = save;
+  that.toString = geometryToStlString;
   return that;
 }());

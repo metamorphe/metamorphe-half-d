@@ -40,7 +40,10 @@ namespace cura {
           ifstream fin;
           std::vector<std::vector<std::string> > result;
           fin.open(filename.c_str()); // open a file
-          if (!fin.good()) return result; // exit if file not found
+          if (!fin.good()){
+            printf("%s not found :( \n", filename.c_str() );
+            return result; // exit if file not found
+          }
           
           // read each line of the file
           while (!fin.eof()){

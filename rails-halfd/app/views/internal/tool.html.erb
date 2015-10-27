@@ -41,26 +41,36 @@ var filepath = "<%= @filepath %>";
 $(function(){
 	
 	env = new WebEnv($("#ThreeJS"));
+	env.camera.position.set(0, -100, 0);
+	env.camera.lookAt(env.scene.position);	
+
 	var loader = new THREE.STLLoader();
-
+	addAxes(env);
 	loader.load( filepath, function ( geometry ) {
+		// var geometry = new THREE.Geometry().fromBufferGeometry( bufferGeometry );
+
+
+			
 		geometry.computeBoundingBox();
+		// geometry.mergeVertices();
+			// geometry.computeFaceNormals();
+			// geometry.computeVertexNormals();
+
+
 		var dimensions = geometry.boundingBox.max.clone().sub(geometry.boundingBox.min);
-		console.log(dimensions);
+		var min = geometry.boundingBox.min.clone().add(dimensions.multiplyScalar(0.5)).multiplyScalar(-1);
+			centerMatrix = new THREE.Matrix4().makeTranslation(min.x, min.y, min.z);
 
-
-		// centerMatrix = new THREE.Matrix4().makeTranslation(0, 0, 0);
-		centerMatrix = new THREE.Matrix4().makeTranslation(0, -dimensions.y/2, 0);
 		var mesh = new THREE.Mesh( geometry, lambertMaterial );
-		// // mesh.position = 
-
+		
 
 		mesh.updateMatrix(); 
 		mesh.geometry.applyMatrix( centerMatrix );
 		mesh.matrix.identity();
 
 		mesh.geometry.verticesNeedUpdate = true;
-		mesh.rotation.x += Math.PI/4 * 6;
+		mesh.rotation.y += Math.PI/4 * 6;
+		bake(mesh);
 
 		mesh.castShadow = true;
 		mesh.receiveShadow = true;
@@ -68,16 +78,26 @@ $(function(){
 		stl = mesh;
 		dim = new DimensionsPreview(env.container);
 		dim.set(dimensions.x, dimensions.y, dimensions.z);
+
+
+
+		carpal = new Carpal(env, 0.10, 5);
+		gui = new dat.GUI();
+		var divisionsController = gui.add(carpal, "divisions");
+		var layerHeightController = gui.add(carpal, "layer_height");
+		var filamentController = gui.add(carpal, "filament_profile", configs);
+		var generateController = gui.add(carpal, "generate");
+		var bakeController = gui.add(carpal, "bake");
+		var rotationXController = gui.add(mesh.rotation, "x", 0, 2 * Math.PI).step(Math.PI/4);
+		var rotationYController = gui.add(mesh.rotation, "y", 0, 2 * Math.PI).step(Math.PI/4);
+		var rotationZController = gui.add(mesh.rotation, "z", 0, 2 * Math.PI).step(Math.PI/4);
+
+		var cureController = gui.add(carpal, "cure");
+		
 		carpal.setModel(stl);
 	} );
 
-	carpal = new Carpal(env, 0.10, 5);
-	gui = new dat.GUI();
-	var divisionsController = gui.add(carpal, "divisions");
-	var layerHeightController = gui.add(carpal, "layer_height");
-	var filamentController = gui.add(carpal, "filament_profile", configs);
-	var generateController = gui.add(carpal, "generate");
-	var filamentController = gui.add(carpal, "cure");
+	
 });
 
 function Carpal(env, layer_height, divisions){
@@ -88,8 +108,11 @@ function Carpal(env, layer_height, divisions){
 }
 
 Carpal.prototype = {
-	cure: function(){
-		HapticPrintCura.curify(filepath, this.filament_profile, "haptics.csv");
+	bake: function(){
+		bake(stl);
+	},
+	cure: function(stl, config){
+		HapticPrintCura.curify(stl, this.filament_profile);
 	},
 	generate: function(){
 
@@ -131,13 +154,35 @@ Carpal.prototype = {
 		console.log("I am carpal with", layer_height, "mm height and", divisions, "divisions");
 
 	},
-	save: function(){
+	save: function(callback){
+		this.bake();
+
+		stl_geom = new THREE.Geometry().fromBufferGeometry( stl.geometry );
+		var stl_data = AsciiStlWriter.toString(stl_geom);
 		var data = $.map(this.planes, function(el, i){
 			return el.data();
 		}).join('\n');
 		// var json = JSON.stringify(data);
-		var blob = new Blob([data], {type: "txt/csv"});
-		var url  = URL.createObjectURL(blob);
+		// var blob = new Blob([data], {type: "txt/csv"});
+		// var url  = URL.createObjectURL(blob);
+	    // var formData = new FormData();
+    	// formData.append('file', blob);
+    	var scope = this;
+      $.ajax({
+        url :  "/internal/tmp_save",
+        type: 'POST',
+        data: {csv: data, 
+        	   stl: stl_data},
+        dataType: "json",
+        success: function(data) {
+          console.log("boa!", data);
+          scope.cure(data.stl);
+        },    
+        error: function() {
+          console.log("not so boa!");
+        }
+      });
+
 
 		// var a = document.createElement('a');
 		// a.download    = "backup.json";
@@ -147,7 +192,7 @@ Carpal.prototype = {
 
 
     	// FileSaver.js defines `saveAs` for saving files out of the browser
-    	saveAs(blob, "carpal.csv");
+    	// saveAs(blob, "carpal.csv");
 	}
 }
 
@@ -164,7 +209,7 @@ HapticPrintCura.curify = function(stl, config, csv){
 	   data: {
 	      stl: stl, 
 	      config: config, 
-	      internals: csv, 
+	      // internals: csv, 
 	      name: name
 	   },
 	   error: function() {
@@ -209,6 +254,8 @@ CarpalTunnel.patterns = ["INFILL_AUTOMATIC",
 		"INFILL_CHAMBERED", 
 		"INFILL_AXIS_CHAMBERED"];
 
+
+
 CarpalTunnel.prototype = {
 	addToGUI: function(gui){
 		this.folder = gui.addFolder("Chamber" + this.id);
@@ -248,6 +295,59 @@ function addStats(container){
 	stats.domElement.style.zIndex = 100;
 	container.appendChild( stats.domElement );
 	return stats;
+}
+
+function addAxes(env){
+		var xlineMaterial = new THREE.LineBasicMaterial({
+        	color: 0xff1111, 
+	        linewidth: 5
+	    });
+
+	    var lineMaterial = new THREE.LineBasicMaterial({
+	        color: 0x1111ff, 
+	        linewidth: 5
+	    });
+	   
+	    var zlineMaterial = new THREE.LineBasicMaterial({
+	        color: 0x11ff11, 
+	        linewidth: 5
+	    });
+		var line_mag = 1000;
+		var geometry = new THREE.Geometry();
+	    geometry.vertices.push(new THREE.Vector3(0, -1 * line_mag, 0));
+	    geometry.vertices.push(new THREE.Vector3(0, 0, 0));
+	    geometry.vertices.push(new THREE.Vector3(0, line_mag, 0));
+        var yline = new THREE.Line(geometry, lineMaterial);
+        env.scene.add(yline);
+
+        var geometry = new THREE.Geometry();
+	    geometry.vertices.push(new THREE.Vector3(-1 * line_mag, 0, 0));
+	    geometry.vertices.push(new THREE.Vector3(0, 0, 0));
+	    geometry.vertices.push(new THREE.Vector3(line_mag, 0,  0));
+        var xline = new THREE.Line(geometry, xlineMaterial);
+        env.scene.add(xline);
+
+        var geometry = new THREE.Geometry();
+	    geometry.vertices.push(new THREE.Vector3(0, 0, -1 * line_mag));
+	    geometry.vertices.push(new THREE.Vector3(0, 0, 0));
+	    geometry.vertices.push(new THREE.Vector3(0, 0, line_mag));
+        var zline = new THREE.Line(geometry, zlineMaterial);
+        env.scene.add(zline);
+}
+
+function bake(mesh){
+	mesh.updateMatrix(); 
+	mesh.geometry.applyMatrix( mesh.matrix );
+	mesh.matrix.identity();
+	// If you have previously rendered, you will have to set the needsUpdate flag:
+
+	mesh.geometry.verticesNeedUpdate = true;
+	// Then reset the position, rotation, and scale properties to their initial values:
+
+	mesh.position.set( 0, 0, 0 );
+	mesh.rotation.set( 0, 0, 0 );
+	mesh.scale.set( 1, 1, 1 );
+	console.log("Baked!");
 }
 </script>
 

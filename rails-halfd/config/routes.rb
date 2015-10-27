@@ -3,6 +3,7 @@ Rails.application.routes.draw do
   get 'internal/tool'
   get 'internal/cure'
   post 'internal/cure'
+  post 'internal/tmp_save'
 
   get 'paperscraps/generate'
 
@@ -15,6 +16,7 @@ Rails.application.routes.draw do
     member do
       get 'threed'
       get 'stld'
+      get 'tool', :to => "internal#tool"
     end
   end
 

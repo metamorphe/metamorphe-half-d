@@ -13,8 +13,10 @@ class SwatchesController < ApplicationController
   def show
   end
 
+  def tool
+    redirect_to "internal/tool"
+  end
   def stld  
-    
     @swatchobj = @swatch
     @files = [@swatch.bump_map_url].to_json.html_safe
     @swatch = @swatch.to_json.html_safe

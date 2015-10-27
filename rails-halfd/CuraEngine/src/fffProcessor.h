@@ -351,11 +351,16 @@ private:
     {
 
         // std::vector<Carpal> carpals = getCarpals(csv_read("tests/csvs/grid_log.csv"));
-        std::vector<Carpal> carpals = getCarpals(csv_read("tests/csvs/bunny.csv"));
+        // console.log
+        char* csv_string = "public/tmp/csv/test.csv";
+        // char* csv_string = "tests/csvs/example.csv";
+        std::vector<Carpal> carpals = getCarpals(csv_read(csv_string));
+        cura::log("Writing g code with %d carpals from %s\n", (int) carpals.size(), csv_string);
         for(int i = 0; i < (int) carpals.size(); i++){
             // carpals[i].toString();
         }
 
+        // return; 
 
         if (fileNr == 1)
         {

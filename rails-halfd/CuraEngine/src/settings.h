@@ -27,7 +27,7 @@ enum Support_Pattern
 };
 
 #ifndef DEFAULT_CONFIG_PATH
-#define DEFAULT_CONFIG_PATH "build/high_PLA.cfg"
+#define DEFAULT_CONFIG_PATH "CuraEngine/build/high_PLA.cfg"
 #endif
 
 #define CONFIG_MULTILINE_SEPARATOR "\"\"\""

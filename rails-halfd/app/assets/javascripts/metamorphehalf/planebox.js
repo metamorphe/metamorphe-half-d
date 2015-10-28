@@ -24,7 +24,7 @@ PlaneBox.prototype = {
 		
 		// vertice indices
 		$.map(geom.vertices, function(el, i){
-			// if(el.z >= self.depth/2.0) 
+			if(el.z >= self.depth/2.0) 
 				self.top_indices.push(i);
 		});
 

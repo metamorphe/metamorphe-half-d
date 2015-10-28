@@ -151,24 +151,66 @@ ConfigSettings::ConfigSettings()
     // ------
     // travelspeed = 12000
     // startup temp = 220
-    startCode = 
-        ";-- START GCODE --\n"
-        ";Sliced for Type A Machines Series 1\n"
-        "M106 S255    ;start with the fan on\n"
-        "G21        ;metric values\n"
-        "G90        ;absolute positioning\n"
-        "M106 S255    ;start with the fan on\n"
-        "G28     ;move to endstops\n"
-        "G29     ;allows for auto-levelling\n"
-        "G1 X150 Y5  Z15.0 F12000 ;center and move the platform down 15mm\n"
-        "M109 S220 ;Heat To temp\n"
-        "G92 E0                  ;zero the extruded length\n"
-        "G1 F200 E30              ;extrude 30mm of feed stock\n"
-        "G92 E0                  ;zero the extruded length again\n"
-        "G1 X175 Y25  Z0 F12000 ;remove bugger\n"
-        "G1 X220 F12000 ;remove bugger\n"
-        "G1 X150 Y150  Z15 F12000 ;recenter and begin\n"
-        "G1 F12000\n";
+
+    startCode = ";-- START GCODE --\n"
+    ";Sliced for Type A Machines Series 1\n"
+    ";Sliced at: {day} {date} {time}\n"
+    ";Basic settings: Layer height: {layer_height} Walls: {wall_thickness} Fill: {fill_density}\n"
+    ";Print Speed: {print_speed} Support: {support}\n"
+    ";Retraction Speed: {retraction_speed} Retraction Distance: {retraction_amount}\n"
+    ";Print time: {print_time}\n"
+    ";Filament used: {filament_amount}m {filament_weight}g\n"
+    ";Filament cost: {filament_cost}\n"
+    "M106 S255    ;start with the fan on\n"
+    "G21        ;metric values\n"
+    "G90        ;absolute positioning\n"
+    "M106 S255    ;start with the fan on\n"
+    "G28     ;move to endstops\n"
+    "G29     ;allows for auto-levelling\n"
+    "G1 X150 Y5  Z15.0 F12000 ;center and move the platform down 15mm\n"
+    "M109 S230 ;Heat To temp\n"
+    "G92 E0                  ;zero the extruded length\n"
+    "G1 F200 E30              ;extrude 30mm of feed stock\n"
+    "G92 E0                  ;zero the extruded length again\n"
+    "G1 X175 Y25  Z0 F12000 ;remove bugger\n"
+    "G1 X220 F12000 ;remove bugger\n"
+    "G1 X150 Y150  Z15 F12000 ;recenter and begin\n"
+    "G1 F12000\n";
+
+    endCode = ";-- END GCODE --\n"
+    "M104 S0     ;extruder heater off\n"
+    "M140 S0     ;heated bed heater off (if you have it)\n"
+    "G91         ;relative positioning\n"
+    "G1 E-1 F300   ;retract the filament a bit before lifting the nozzle, to release some of the pressure\n"
+    "G1 Z+0.5 E-5 X-20 Y-20 F12000 ;move Z up a bit and retract filament even more\n"
+    "G28 X0 Y0     ;move X/Y to min endstops, so the head is out of the way\n"
+    "M84           ;steppers off\n"
+    "G90           ;absolute positioning\n"
+    ";CURA_PROFILE_STRING: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\n"
+    ";CURA_PROFILE_STRING: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\n";
+
+
+
+    // startCode = 
+    //     ";-- START GCODE --\n"
+    //     ";Sliced for Type A Machines Series 1\n"
+    //     "M106 S255    ;start with the fan on\n"
+    //     "G21        ;metric values\n"
+    //     "G90        ;absolute positioning\n"
+    //     "M106 S255    ;start with the fan on\n"
+    //     "G28     ;move to endstops\n"
+    //     "G29     ;allows for auto-levelling\n"
+    //     "G1 X150 Y5  Z15.0 F12000 ;center and move the platform down 15mm\n"
+    //     "M109 S220 ;Heat To temp\n"
+    //     "G92 E0                  ;zero the extruded length\n"
+    //     "G1 F200 E30              ;extrude 30mm of feed stock\n"
+    //     "G92 E0                  ;zero the extruded length again\n"
+    //     "G1 X175 Y25  Z0 F12000 ;remove bugger\n"
+    //     "G1 X220 F12000 ;remove bugger\n"
+    //     "G1 X150 Y150  Z15 F12000 ;recenter and begin\n"
+    //     "G1 F12000\n";
+
+
 
     // endCode =
     //     "M104 S0                     ;extruder heater off\n"
@@ -181,16 +223,16 @@ ConfigSettings::ConfigSettings()
     //     "G90                         ;absolute positioning\n";
         // travel_speed = 9000
 
-        endCode =
-            ";-- END GCODE --\n"
-            "M104 S0     ;extruder heater off\n"
-            "M140 S0     ;heated bed heater off (if you have it)\n"
-            "G91         ;relative positioning\n"
-            "G1 E-1 F300   ;retract the filament a bit before lifting the nozzle, to release some of the pressure\n"
-            "G1 Z+0.5 E-5 X-20 Y-20 F12000 ;move Z up a bit and retract filament even more\n"
-            "G28 X0 Y0     ;move X/Y to min endstops, so the head is out of the way\n"
-            "M84           ;steppers off\n"
-            "G90           ;absolute positioning\n";
+        // endCode =
+        //     ";-- END GCODE --\n"
+        //     "M104 S0     ;extruder heater off\n"
+        //     "M140 S0     ;heated bed heater off (if you have it)\n"
+        //     "G91         ;relative positioning\n"
+        //     "G1 E-1 F300   ;retract the filament a bit before lifting the nozzle, to release some of the pressure\n"
+        //     "G1 Z+0.5 E-5 X-20 Y-20 F12000 ;move Z up a bit and retract filament even more\n"
+        //     "G28 X0 Y0     ;move X/Y to min endstops, so the head is out of the way\n"
+        //     "M84           ;steppers off\n"
+        //     "G90           ;absolute positioning\n";
             
 
 }
@@ -200,7 +242,7 @@ ConfigSettings::ConfigSettings()
 
 bool ConfigSettings::setSetting(const char* key, const char* value)
 {
-    // cura::log("Setting %s to %s\n", key, value);
+    cura::log("Setting %s to %s\n", key, value);
     for(unsigned int n=0; n < _index.size(); n++)
     {
         if (stringcasecompare(key, _index[n].key) == 0)
@@ -238,7 +280,7 @@ bool ConfigSettings::readSettings(void) {
 }
 
 bool ConfigSettings::readSettings(const char* path) {
-    cura::log("Reading settings... %s\n", path);
+    printf("Reading settings... %s\n", path);
     std::ifstream config(path);
     std::string line;
     size_t line_number = 0;

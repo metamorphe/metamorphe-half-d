@@ -92,7 +92,18 @@
               }), 
                 :class => "btn btn-default", 
                 :title => "View 3D" do %>
-                  <%= glyph("eye-open") %> 
+                  <%= glyph("eye-open") %> REFERENCE
+  <% end %>
+  <%=link_to stld_swatch_path(@swatch), :class => "btn btn-default", 
+                :title => "View 3D" do %>
+                  <%= glyph("certificate") %> TACTILE
+
+  <% end %>
+
+  <%=link_to tool_swatch_path(@swatch), :class => "btn btn-default", 
+                :title => "View 3D" do %>
+                  <%= glyph("tasks") %> FILL
+
   <% end %>
  
 </div>

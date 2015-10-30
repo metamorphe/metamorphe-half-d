@@ -21,7 +21,8 @@ class InternalController < ApplicationController
   		posx = 0
   		posy = 0
   		# -s posx=#{posx} -s posy=#{posy}
-  		gcode = `./CuraEngine/build/CuraEngine -c 'CuraEngine/build/#{params[:config]}.cfg'   -o public/gcodes/#{params[:name]}.gcode public/#{params[:stl]}`
+  		gcode = `./CuraEngine/build/CuraEngine -c 'CuraEngine/build/#{params[:config]}.cfg' -o public/gcodes/#{params[:name]}.gcode public/#{params[:stl]} -s posx=122500 -s posy=122500
+`
   		# ./CuraEngine/build/CuraEngine -c 'build/high_PLE.cfg' -s infillPatern=2 -v -o tests/gcodes/bunny_big_test.gcode tests/stls/bunny_big.stl
   		gcode = "/" + gcode.split('/')[1..-1].join('/')
   		params[:gcode] = gcode

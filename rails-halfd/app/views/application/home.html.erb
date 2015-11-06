@@ -1,6 +1,6 @@
-<div class="grid_12 alpha">
+<div class="col-xs-12">
 	<!-- DESCRIPTION -->
-	<div class="grid_12">
+	<div class="col-xs-12">
 		<h2> Haptic Print - Designing Feel Aesthetics for 3D Printing </h2>
 		<p class='lead'>
 			<em> 
@@ -18,17 +18,75 @@
 			Digital fabrication has enabled massive creativity in hobbyist communities and professional product design. These emerging technologies excel at realizing an arbitrary shape or form; however these objects are often rigid and lack the feel desired by designers. We aim to enable physical haptic design in passive 3D printed objects. This paper identifies two core areas for extending physical design into digital fabrication: designing the external and internal haptic characteristics of an object. We present HapticPrint as a pair of design tools to easily modify the feel of a 3D model. Our external tool maps textures and UI elements onto arbitrary shapes, and our internal tool modifies the internal geometry of models for novel compliance and weight characteristics. We demonstrate the value of HapticPrint with a range of applications that expand the aesthetics of feel, usability, and interactivity in 3D artifacts.
 		</p>
 		<p class="lead"> Demo by: Cesar Torres, Neil Kumar, Emily Chou, and Connor Freeman </p>
-		<%= link_to swatches_path, :class => "btn btn-primary btn-lg" do %>
-			<span class="glyphicon glyphicon-book"> </span> HapticPrint Library
-		<% end %>
+		
 
-		<%= link_to "#", :disabled=>"true", :class => "btn btn-default btn-lg" do %>
-			<span class="glyphicon glyphicon-file"> </span> HapticPrint UIST'15 Paper (available Nov 10)
+		<%= link_to "/uist3872-torresA.pdf", :class => "btn btn-danger btn-lg" do %>
+			<span class="glyphicon glyphicon-file"> </span> HapticPrint UIST'15 Paper
+		<% end %>
+		<%= link_to "http://dl.acm.org/citation.cfm?id=2807492", :class => "btn btn-default btn-lg" do %>
+			<span class="glyphicon glyphicon-globe"> </span> ACM Page
 		<% end %>
 		</p>
+		<hr>
+
+		<iframe width="560" height="315" src="https://www.youtube.com/embed/H6SuPI2jFhw" frameborder="0" allowfullscreen></iframe>
+		<hr>
+		<div class="row">
+			<div class="col-xs-4">
+				<%= image_tag "/hapticprintexternal.png", :width => "100%" %>
+			</div>
+			<div class="col-xs-8">
+				<h1> External Design Tool </h1>
+				<p class="lead"> Our external tool can generate 2.5D tactile textures on a variety of surfaces. </p>
+			</div>
+		</div>
+		<p></p>
+		<div class="row">
+			<div class="col-xs-4">
+				<%= image_tag "/hapticprintinternal.png", :width => "100%" %>
+			</div>
+			<div class="col-xs-8">
+				<h1> Internal Design Tool </h1>
+				<p class="lead"> Our internal tool controls stiffness and mass distribution using special haptic infills.</p>
+			</div>
+		</div>
+		<hr>
+		<div class="row text-center">			
+				<h1 class='centered'> Print your own set! </h1>
+				<p class="lead centered"> Print your own set of reference designs, or palettes. </p>
+				<%= link_to swatches_path, :class => "btn disabled btn-primary btn-lg" do %>
+					<span class="glyphicon glyphicon-book"> </span> HapticPrint Library (coming soon!)
+				<% end %>
+		</div>
+		<hr> 
+		<p></p>
+		<div class="row text-center">			
+				<h1 class='centered'> Publication Links </h1>
+				<!-- <p class="lead centered"> Printable your own set of reference designs, or palettes. </p>
+				 -->
+				<%= link_to "/uist3872-torresA.pdf", :class => "btn btn-danger btn-lg" do %>
+					<span class="glyphicon glyphicon-file"> </span> HapticPrint UIST'15 Paper
+				<% end %>
+				<%= link_to "http://dl.acm.org/citation.cfm?id=2807492", :class => "btn btn-default btn-lg" do %>
+					<span class="glyphicon glyphicon-globe"> </span> ACM Page
+				<% end %>
+			</div>
+		<br>
+		<br>
+		<br>
 	</div>
+
+	
 
 
 
 </div>
+<style type="text/css">
+iframe{
+	margin: 10px calc((100% - 560px) / 2);
+}
+.centered{
+	text-align: center;
+}
+</style>
 

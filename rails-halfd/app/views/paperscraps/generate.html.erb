@@ -78,6 +78,12 @@
   	var size = parseFloat($("#plane-size").val());
   	loadTexture(size, feature_size, feature_gap);
   });
+  $("input").on('input', function(){
+    var feature_size = parseFloat($("#feature-size").val());
+    var feature_gap = parseFloat($("#feature-gap").val());
+    var size = parseFloat($("#plane-size").val());
+    loadTexture(size, feature_size, feature_gap);
+  });
 }
 </script>
 

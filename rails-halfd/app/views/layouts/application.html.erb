@@ -52,6 +52,7 @@
 	        <li class="<%= params[:action] == "home" ? "active" : "" %>">
 	        	<a href="/"> Home</a>
 	        </li>
+	        <% if user_signed_in? %>
 	        <li class="<%= params[:controller] == "swatches" ? "active" : "" %>">
 	        		<%= link_to "Swatches", swatches_path %>
         	</li>  
@@ -71,7 +72,7 @@
         		<li><%= link_to "internal tool", internal_tool_path , :class=> "navbar-link" %> </li>
 	          </ul>
 			</li>
-				  	
+				 <%end%>	
 	       </ul>
 	       <!-- Sign in -->
 	   <ul class="nav navbar-nav navbar-right">
@@ -123,7 +124,7 @@
 <footer class="footer shadow">
   <div class="container">
     <p class="text-muted"> <a href="/"><b>HapticPrint</b></a>
-    	CC BY-SA 4.0 UC Berkeley 2014-15</p>
+    	&copy; UC Berkeley 2014-15</p>
   </div>
 </footer>
 

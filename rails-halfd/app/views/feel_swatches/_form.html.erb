@@ -1,0 +1,37 @@
+<%= form_for(@feel_swatch) do |f| %>
+  <% if @feel_swatch.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@feel_swatch.errors.count, "error") %> prohibited this feel_swatch from being saved:</h2>
+
+      <ul>
+      <% @feel_swatch.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :name %><br>
+    <%= f.text_field :name %>
+  </div>
+  <div class="field">
+    <%= f.label :skin %><br>
+    <%= f.number_field :skin %>
+  </div>
+  <div class="field">
+    <%= f.label :structure %><br>
+    <%= f.number_field :structure %>
+  </div>
+  <div class="field">
+    <%= f.label :author %><br>
+    <%= f.number_field :author %>
+  </div>
+  <div class="field">
+    <%= f.label :description %><br>
+    <%= f.text_area :description %>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

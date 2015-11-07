@@ -6,6 +6,7 @@ Rails.application.routes.draw do
   post 'internal/tmp_save'
 
   get 'paperscraps/generate'
+  get 'paperscraps/arduino'
 
   devise_for :users
   resources :user, :only => ["show"]

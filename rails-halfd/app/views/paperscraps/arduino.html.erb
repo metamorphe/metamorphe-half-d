@@ -1,0 +1,438 @@
+<script type="text/javascript">
+$(document).ready(function() {
+  $('input[type="range"]').on("input", function(){
+    calibrate();
+  });
+    ws = new WebSocket("ws://localhost:3015");
+ 
+    ws.onopen = function() {
+        ws.send("hello server");
+    };
+    ws.onclose = function() {};
+ 
+    ws.onmessage = function(evt) {
+        
+        if(evt.data){
+          try{
+            var message = JSON.parse(evt.data);
+            if(message.event.valid && message.event.id == 0){
+              // console.log(evt.data)
+              tock(message.event.value / 30);
+            }
+
+          }
+          catch(e){
+            console.log("ERROR", e, evt.data);
+          }
+        }
+ 
+        // code to update the page given the incoming message
+ 
+        // send a dummy message back to initiate
+        // the onmessage callback again
+        ws.send("next message please!");
+    }
+});
+
+
+function calibrate(){
+  fontSize = 34;
+  // high = $('#high').val();
+  medium = $('#medium').val();
+  low = $('#low').val();
+
+  greenH = low / 10 * height;
+  greenY = height - greenH
+  svg.selectAll('.greenRect')
+    .attr('height', greenH)
+    .attr('y', greenY);
+
+  svg.selectAll(".touchText")
+    .attr('y', height - (greenH/2) + (fontSize/2));
+
+  yellowH = (medium-low)/10*height;
+  yellowY = height - yellowH - greenH;
+  svg.selectAll('.yellowRect')
+    .attr('height', yellowH) 
+    .attr('y', yellowY);
+
+  svg.selectAll(".pressText")
+    .attr('y', height - (yellowH/2) - greenH + (fontSize/2));
+
+  redH = (high-medium)/10*height;
+  redY = height - redH - yellowH - greenH;
+  svg.selectAll('.redRect')
+    .attr('y', redY)
+    .attr('height', redH);
+
+  svg.selectAll(".ambientText")
+    .attr('y', height - (redH/2) - yellowH - greenH + (fontSize/2));
+    console.log("Values", high, medium, low);
+}
+</script>
+
+<style>
+
+svg {
+  font: 10px sans-serif;
+}
+
+.line {
+  fill: none;
+  stroke: #000;
+  stroke-width: 1.5px;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+</style>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+
+<script>
+
+var n = 40,
+    random = d3.random.normal(0, .2),
+    data = d3.range(n).map(random),
+    vals = 1;
+
+var margin = {top: 20, right: 20, bottom: 20, left: 40},
+    width = 960 - margin.left - margin.right, //900
+    height = 500 - margin.top - margin.bottom; //460
+
+var x = d3.scale.linear()
+    .domain([0, n - 1])
+    .range([0, width]);
+
+var y = d3.scale.linear()
+    .domain([0, 10])
+    .range([height, 0]);
+
+//Color to white 
+var line = d3.svg.line()
+    .x(function(d, i) { return x(i); })
+    .y(function(d, i) { return y(d); });
+
+var svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+//Adjusted after calibration.
+var high, medium, low; 
+
+high = 10;
+medium = 7;
+low = 4;
+
+var gradient = svg.append("svg:defs")
+  .append("svg:linearGradient")
+    .attr("id", "gradient")
+    .attr("x1", "0%")
+    .attr("y1", "0%")
+    .attr("x2", "100%")
+    .attr("y2", "100%")
+    .attr("spreadMethod", "pad");
+
+gradient.append("svg:stop")
+    .attr("offset", "0%")
+    // .attr("stop-color", "#0c0")
+    .attr("stop-color", "lightgreen")
+    .attr("stop-opacity", 0.8);
+
+gradient.append("svg:stop")
+    .attr("offset", "100%")
+    .attr("stop-color", "green")
+    .attr("stop-opacity", 0.8);
+
+//Bottom - Green
+svg.append("rect")
+    .attr("x", 0)
+    .attr("y", 275)
+    .style("fill", "lightgreen")
+    .attr("height", (low)/10*height)
+    .attr("width", width)
+    .attr("class", "greenRect")
+    .style("fill", "url(#gradient)");
+
+//Middle - Yellow
+
+var gradient2 = svg.append("svg:defs")
+  .append("svg:linearGradient")
+    .attr("id", "gradient2")
+    .attr("x1", "0%")
+    .attr("y1", "0%")
+    .attr("x2", "100%")
+    .attr("y2", "100%")
+    .attr("spreadMethod", "pad");
+
+gradient2.append("svg:stop")
+    .attr("offset", "0%")
+    // .attr("stop-color", "#0c0")
+    .attr("stop-color", "khaki")
+    .attr("stop-opacity", 0.8);
+
+gradient2.append("svg:stop")
+    .attr("offset", "100%")
+    .attr("stop-color", "yellow")
+    .attr("stop-opacity", 0.8);
+
+svg.append("rect")
+    .attr("x", 0)
+    .attr("y", 137)
+    .style("fill", "khaki")
+    .attr("height", (medium-low)/10*height)
+    .attr("width", width)
+    .attr("class", "yellowRect")
+    .style("fill", "url(#gradient2)");
+
+//Top - Red
+
+var gradient3 = svg.append("svg:defs")
+  .append("svg:linearGradient")
+    .attr("id", "gradient3")
+    .attr("x1", "0%")
+    .attr("y1", "0%")
+    .attr("x2", "100%")
+    .attr("y2", "100%")
+    .attr("spreadMethod", "pad");
+
+gradient3.append("svg:stop")
+    .attr("offset", "0%")
+    // .attr("stop-color", "#0c0")
+    .attr("stop-color", "indianred")
+    .attr("stop-opacity", 0.8);
+
+gradient3.append("svg:stop")
+    .attr("offset", "100%")
+    .attr("stop-color", "maroon")
+    .attr("stop-opacity", 0.8);
+
+svg.append("rect")
+    .attr("x", 0)
+    .attr("y", 0)
+    .style("fill", "indianred")
+    .attr("height", (high-medium)/10*height)
+    .attr("width", width)
+    .attr("class", "redRect")
+    .style("fill", "url(#gradient3)");
+
+svg.append("text")
+  .text("TOUCH")
+  .attr("class", "touchText")
+  .attr("fill", "green")
+  .attr("x", width/2-100)
+  .attr("y", height-75)
+  .style("font-size","34px")
+  .style("font-weight", "bold")
+  .attr( "fill-opacity", 0.8);
+
+svg.append("text")
+  .text("PRESS")
+  .attr("class", "pressText")
+  .attr("fill", "goldenrod")
+  .attr("x", width/2-90)
+  .attr("y", height-225)
+  .style("font-size","34px")
+  .style("font-weight", "bold")
+  .attr( "fill-opacity", 0.8);
+
+svg.append("rect")
+    .attr("x", width-210)
+    .attr("y", 10)
+    .style("fill", "white")
+    .style("stroke", "black")
+    .attr("rx", 6)
+    .attr("ry", 6)
+    .attr("height", 80)
+    .attr( "fill-opacity", 0.9)
+    .attr("width", 200)
+    .attr("class", "whiteRect");
+
+svg.append("text")
+  .text(function() {
+      return ""
+  })
+  .attr("fill", "black")
+  .attr("x", width-170)
+  .attr("y", 60)
+  .style("font-size","34px")
+  .attr( "fill-opacity", 0.9)
+  .attr("class", "label");
+
+svg.append("text")
+  .text("AMBIENT")
+  .attr("fill", "maroon")
+  .attr("x", width/2-100)
+  .attr("y", height-375)
+  .attr("class", "ambientText")
+  .style("font-size","34px")
+  .style("font-weight", "bold")
+  .attr( "fill-opacity", 0.8);
+
+svg.append("defs").append("clipPath")
+    .attr("id", "clip")
+  .append("rect")
+    .attr("width", width)
+    .attr("height", height);
+
+svg.append("gs")
+    .attr("class", "x axis")
+    // .attr("transform", "translate(0," + y(0) + ")")
+    .attr("transform", "translate(0," + y(0) + ")")
+    .style("stroke", "white")
+    .call(d3.svg.axis().scale(x).orient("bottom"));
+
+svg.append("g")
+    .attr("class", "y axis")
+    .style("stroke", "white")
+    .call(d3.svg.axis().scale(y).orient("left"));
+
+svg.append("text")
+  .text(low)
+  .attr("fill", "black")
+  .attr("x", -15)
+  .attr("y", 275)
+  .style("font-size","10px")
+  .attr( "fill-opacity", 1);
+
+  svg.append("text")
+  .text(medium)
+  .attr("fill", "black")
+  .attr("x", -15)
+  .attr("y", 137)
+  .style("font-size","10px")
+  .attr( "fill-opacity", 1);
+
+  svg.append("text")
+  .text(high)
+  .attr("fill", "black")
+  .attr("x", -15)
+  .attr("y", 0)
+  .style("font-size","10px")
+  .attr( "fill-opacity", 1);
+
+var path = svg.append("g")
+    .attr("clip-path", "url(#clip)")
+  .append("path")
+    .datum(data)
+    .attr("class", "line")
+    .attr("d", line)
+    .style("stroke-width", "5px")
+    .style("stroke", "white");
+
+// tick();
+
+function determineLabel(pressVal) {
+
+  if (pressVal >= 0 && pressVal <= low) {
+      return "TOUCH";
+  }
+
+  else if (pressVal > low && pressVal <= medium) {
+      return "PRESS"; 
+  }
+
+  else {
+      return "AMBIENT";
+    }
+}
+
+function tock(val) {
+
+  // push a new data point onto the back
+  // data.push(random());
+  data.push(val);
+
+  // redraw the line, and slide it to the left
+  path
+      .attr("d", line)
+      .attr("transform", null)
+    .transition()
+      .duration(500)
+      .ease("linear")
+      .attr("transform", "translate(" + x(-1) + ",0)")
+      // .each("end", tick);
+
+  d3.selectAll(".label").text(function() {
+
+      if (determineLabel(val) == "AMBIENT") {
+           d3.selectAll(".label").style("font-size","30px")
+      }
+
+      else {
+          d3.selectAll(".label").style("font-size","34px")
+      }
+
+      return determineLabel(val);
+  });
+
+  // pop the old data point off the front
+  data.shift();
+
+}
+
+// function tick() {
+
+//   // push a new data point onto the back
+//   // data.push(random());
+
+//   if (vals >= 10) 
+//     vals = 1;
+
+//   else 
+//     vals++;
+
+//   data.push(vals);
+
+//   // redraw the line, and slide it to the left
+//   path
+//       .attr("d", line)
+//       .attr("transform", null)
+//     .transition()
+//       .duration(500)
+//       .ease("linear")
+//       .attr("transform", "translate(" + x(-1) + ",0)")
+//       .each("end", tick);
+
+//   d3.selectAll(".label").text(function() {
+
+//       if (determineLabel(vals) == "AMBIENT") {
+//            d3.selectAll(".label").style("font-size","30px")
+//       }
+
+//       else {
+//           d3.selectAll(".label").style("font-size","34px")
+//       }
+
+//       return determineLabel(vals);
+//   });
+
+//   // pop the old data point off the front
+//   data.shift();
+
+// }
+
+</script>
+
+<div class="col-xs-3">
+  <label>Lower Boundary</label>
+    <input id="low" class="form-control" type="range" value="4" step="0.01" min="0" max="10"/>
+</div>
+<div class="col-xs-3">
+  <label>Upper Boundary</label>
+    <input id="medium" class="form-control" type="range" value="7" step="0.01" min="0" max="10"/>
+</div>
+<!-- <div class="col-xs-3">
+  <label>high</label>
+    <input id="high" class="form-control" type="range" value="10" step="0.01" min="0" max="10"/>
+</div>
+<div class="col-xs-3">
+  <br><button id="calibrate" class="btn btn-lg btn-danger"> CALIBRATE </button>
+</div> -->

@@ -1,0 +1,33 @@
+<h1>Listing feel_swatches</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Skin</th>
+      <th>Structure</th>
+      <th>Author</th>
+      <th>Description</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @feel_swatches.each do |feel_swatch| %>
+      <tr>
+        <td><%= feel_swatch.name %></td>
+        <td><%= feel_swatch.skin %></td>
+        <td><%= feel_swatch.structure %></td>
+        <td><%= feel_swatch.author %></td>
+        <td><%= feel_swatch.description %></td>
+        <td><%= link_to 'Show', feel_swatch %></td>
+        <td><%= link_to 'Edit', edit_feel_swatch_path(feel_swatch) %></td>
+        <td><%= link_to 'Destroy', feel_swatch, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Feel swatch', new_feel_swatch_path %>

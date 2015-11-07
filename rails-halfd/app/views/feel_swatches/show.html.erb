@@ -1,0 +1,29 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Name:</strong>
+  <%= @feel_swatch.name %>
+</p>
+
+<p>
+  <strong>Skin:</strong>
+  <%= @feel_swatch.skin %>
+</p>
+
+<p>
+  <strong>Structure:</strong>
+  <%= @feel_swatch.structure %>
+</p>
+
+<p>
+  <strong>Author:</strong>
+  <%= @feel_swatch.author %>
+</p>
+
+<p>
+  <strong>Description:</strong>
+  <%= @feel_swatch.description %>
+</p>
+
+<%= link_to 'Edit', edit_feel_swatch_path(@feel_swatch) %> |
+<%= link_to 'Back', feel_swatches_path %>
